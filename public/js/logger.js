@@ -9,6 +9,9 @@ function setuplogger() {
             } else {
                 logger.innerHTML += message + '<br />';
             }
+            var objDiv = document.getElementById("log");
+            objDiv.scrollTop = objDiv.scrollHeight;
         }
+
     }
 }

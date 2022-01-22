@@ -1,7 +1,7 @@
-const serverIp      = '10.0.0.23';
-const serverPort    = '3000';
-const local         = true;   // true if running locally, false
-                              // if running on remote server
+const serverIp = '10.0.0.23';
+const serverPort = '3000';
+const local = true; // true if running locally, false
+// if running on remote server
 
 // Global variables here. ---->
 
@@ -16,16 +16,22 @@ function setup() {
   console.log('Initializing...');
   createCanvas(windowWidth, windowHeight);
 
-  sendData('playerColor', { 
+  sendData('playerColor', {
     r: 255,
     g: 255,
     b: 255
   });
 }
 
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
 function draw() {
   background(0);
+  displayAddress();
 }
+
 
 window.addEventListener('deviceorientation', function (ev) {
   console.info(ev.alpha, ev.beta, ev.gamma);
@@ -37,20 +43,10 @@ window.addEventListener('devicemotion', function (ev) {
   console.log(ev.acceleration.y);
 })
 
-function onReceiveData (data) {
+function onReceiveData(data) {
   // Input data processing here. --->
 
   if (data.type === 'timestamp') {
     print(data.timestamp);
   }
-
-  // <----
-
-  /* Example:
-     if (data.type === 'myDataType') {
-       processMyData(data);
-     }
-
-     Use `data.type` to get the message type sent by host.
-  */
 }

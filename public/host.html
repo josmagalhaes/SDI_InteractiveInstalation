@@ -22,24 +22,54 @@
     body {
       padding: 0;
       margin: 0;
+      overflow: hidden;
+    }
+
+    .bottom-bar {
+      height: 130px;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      color: white;
+      background-color: #24242449;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #url {
+      font-weight: bold;
+      font-size: 2em;
+    }
+
+    .col1 {
+      width: 90%;
+      height: 100%;
+    }
+
+    .col2 {
+      height: 100%;
     }
   </style>
 </head>
 
 <body>
-  <div
-    style="height:140px; padding:10px; position:fixed; bottom:0; left:0; right:0; color:white; background-color: #242424;">
-    <div style="height: 100%; width: 85%; display: inline-block;">
-      <span style="font-weight: bold;">Console:</span>
-      <div id="log" style="height: 130px; overflow-y: scroll;"></div>
+  <div class="bottom-bar">
+    <div class="col1">
+      <div id="url"></div>
+      <div style="height: 100%; width: 85%; display: inline-block;">
+        <span style="font-weight: bold;">Console:</span>
+        <div id="log" style="height: 80px; overflow-y: scroll;"></div>
+      </div>
     </div>
-    <div style="width: 14%; height:100%; display: inline-block;">
-      <div id="qrcode"
-        style=" z-index:100; padding: 5px; background-color: #555555;  display: flex; justify-content: center;"></div>
+    <div class="col2">
+      <div id="qrcode" style="z-index:100; display: flex; justify-content: center;"></div>
     </div>
   </div>
 </body>
-<script src="logger.js"></script>
+<script src="js/logger.js"></script>
+<script src="js/ip.js"></script>
 <script src="host.js"></script>
 
 </html>
