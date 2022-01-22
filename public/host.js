@@ -15,14 +15,14 @@ Run http-server -c-1 -p80 to start server on open port 80.
 // Network Settings
 // const serverIp      = 'https://yourservername.herokuapp.com';
 // const serverIp      = 'https://yourprojectname.glitch.me';
-const serverIp      = '10.0.0.23';
-const serverPort    = '3000';
-const local         = true;   // true if running locally, false
-                              // if running on remote server
+const serverIp = '10.0.0.23';
+const serverPort = '3000';
+const local = true; // true if running locally, false
+// if running on remote server
 
 // Global variables here. ---->
 
-const velScale	= 10;
+const velScale = 10;
 const debug = true;
 let game;
 
@@ -32,25 +32,26 @@ function preload() {
   setupHost();
 }
 
-function setup () {
+function setup() {
+  setuplogger();
+  console.log('Initializing...');
   createCanvas(500, 500);
-
-  // Host/Game setup here. ---->
   
+
   game = new Game(width, height);
 
-  
- 
+
+
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
-function draw () {
+function draw() {
   background(15);
 
-  if(isHostConnected(display=true)) {
+  if (isHostConnected(display = true)) {
     // Host/Game draw here. --->
 
     // Display player IDs in top left corner
@@ -66,22 +67,22 @@ function draw () {
   }
 }
 
-function onClientConnect (data) {
+function onClientConnect(data) {
   // Client connect logic here. --->
   console.log(data.id + ' has connected.');
 
   if (!game.checkId(data.id)) {
     game.add(data.id,
-            random(0.25*width, 0.75*width),
-            random(0.25*height, 0.75*height),
-            60, 60
+      random(0.25 * width, 0.75 * width),
+      random(0.25 * height, 0.75 * height),
+      60, 60
     );
   }
 
   // <----
 }
 
-function onClientDisconnect (data) {
+function onClientDisconnect(data) {
   // Client disconnect logic here. --->
 
   if (game.checkId(data.id)) {
@@ -91,18 +92,16 @@ function onClientDisconnect (data) {
   // <----
 }
 
-function onReceiveData (data) {
+function onReceiveData(data) {
   // Input data processing here. --->
   console.log(data);
 
   if (data.type === 'joystick') {
     processJoystick(data);
-  }
-  else if (data.type === 'button') {
+  } else if (data.type === 'button') {
     processButton(data);
-  }
-  else if (data.type === 'playerColor') {
-    game.setColor(data.id, data.r*255, data.g*255, data.b*255);
+  } else if (data.type === 'playerColor') {
+    game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
   }
 
   // <----
@@ -119,30 +118,32 @@ function onReceiveData (data) {
 // This is included for testing purposes to demonstrate that
 // messages can be sent from a host back to all connected clients
 function mousePressed() {
-  sendData('timestamp', { timestamp: millis() });
+  sendData('timestamp', {
+    timestamp: millis()
+  });
 }
 
 ////////////
 // Input processing
-function processJoystick (data) {
-  
-  game.setVelocity(data.id, data.joystickX*velScale, -data.joystickY*velScale);
+function processJoystick(data) {
+
+  game.setVelocity(data.id, data.joystickX * velScale, -data.joystickY * velScale);
 
   if (debug) {
     console.log(data.id + ': {' +
-                data.joystickX + ',' +
-                data.joystickY + '}');
+      data.joystickX + ',' +
+      data.joystickY + '}');
   }
 }
 
-function processButton (data) {
+function processButton(data) {
   game.players[data.id].val = data.button;
 
   game.createRipple(data.id, 300, 1000);
-  
+
   if (debug) {
     console.log(data.id + ': ' +
-                data.button);
+      data.button);
   }
 }
 
@@ -150,19 +151,19 @@ function processButton (data) {
 // Game
 // This simple placeholder game makes use of p5.play
 class Game {
-  constructor (w, h) {
-    this.w          = w;
-    this.h          = h;
-    this.players	= {};
-    this.numPlayers	= 0;
-    this.id         = 0;
-    this.colliders	= new Group();
-    this.ripples    = new Ripples();
+  constructor(w, h) {
+    this.w = w;
+    this.h = h;
+    this.players = {};
+    this.numPlayers = 0;
+    this.id = 0;
+    this.colliders = new Group();
+    this.ripples = new Ripples();
   }
 
-  add (id, x, y, w, h) {
+  add(id, x, y, w, h) {
     this.players[id] = createSprite(x, y, w, h);
-    this.players[id].id = "p"+this.id;
+    this.players[id].id = "p" + this.id;
     this.players[id].setCollider("rectangle", 0, 0, w, h);
     this.players[id].color = color(255, 255, 255);
     this.players[id].shapeColor = color(255, 255, 255);
@@ -182,73 +183,76 @@ class Game {
 
   createRipple(id, r, duration) {
     this.ripples.add(
-      this.players[id].position.x, 
-      this.players[id].position.y, 
-      r, 
-      duration, 
+      this.players[id].position.x,
+      this.players[id].position.y,
+      r,
+      duration,
       this.players[id].color);
   }
 
-  setColor (id, r, g, b) {
+  setColor(id, r, g, b) {
     this.players[id].color = color(r, g, b);
     this.players[id].shapeColor = color(r, g, b);
 
     print(this.players[id].id + " color added.");
   }
 
-  remove (id) {
-      this.colliders.remove(this.players[id]);
-      this.players[id].remove();
-      delete this.players[id];
-      this.numPlayers--;
+  remove(id) {
+    this.colliders.remove(this.players[id]);
+    this.players[id].remove();
+    delete this.players[id];
+    this.numPlayers--;
   }
 
-  checkId (id) {
-      if (id in this.players) { return true; }
-      else { return false; }
+  checkId(id) {
+    if (id in this.players) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  printPlayerIds (x, y) {
-      push();
-          noStroke();
-          fill(255);
-          textSize(16);
-          text("# players: " + this.numPlayers, x, y);
+  printPlayerIds(x, y) {
+    push();
+    noStroke();
+    fill(255);
+    textSize(16);
+    text("# players: " + this.numPlayers, x, y);
 
-          y = y + 16;
-          fill(200);
-          for (let id in this.players) {
-              text(this.players[id].id, x, y);
-              y += 16;
-          }
+    y = y + 16;
+    fill(200);
+    for (let id in this.players) {
+      text(this.players[id].id, x, y);
+      y += 16;
+    }
 
-      pop();
+    pop();
   }
 
   setVelocity(id, velx, vely) {
-      this.players[id].velocity.x = velx;
-      this.players[id].velocity.y = vely;
+    this.players[id].velocity.x = velx;
+    this.players[id].velocity.y = vely;
   }
 
   checkBounds() {
-      for (let id in this.players) {
+    for (let id in this.players) {
 
-          if (this.players[id].position.x < 0) {
-              this.players[id].position.x = this.w - 1;
-          }
-
-          if (this.players[id].position.x > this.w) {
-              this.players[id].position.x = 1;
-          }
-
-          if (this.players[id].position.y < 0) {
-              this.players[id].position.y = this.h - 1;
-          }
-
-          if (this.players[id].position.y > this.h) {
-              this.players[id].position.y = 1;
-          }
+      if (this.players[id].position.x < 0) {
+        this.players[id].position.x = this.w - 1;
       }
+
+      if (this.players[id].position.x > this.w) {
+        this.players[id].position.x = 1;
+      }
+
+      if (this.players[id].position.y < 0) {
+        this.players[id].position.y = this.h - 1;
+      }
+
+      if (this.players[id].position.y > this.h) {
+        this.players[id].position.y = 1;
+      }
+    }
   }
 }
 
@@ -265,29 +269,13 @@ class Ripples {
   draw() {
     for (let i = 0; i < this.ripples.length; i++) {
       // Draw each ripple in the array
-      if(this.ripples[i].draw()) {
+      if (this.ripples[i].draw()) {
         // If the ripple is finished (returns true), remove it
         this.ripples.splice(i, 1);
       }
     }
   }
 }
-
-(function () {
-  var old = console.log;
-  var logger = document.getElementById('log');
-  console.log = function (message) {
-
-    if(logger != null)
-    {
-      if (typeof message == 'object') {
-          logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
-      } else {
-          logger.innerHTML += message + '<br />';
-      }
-    }
-  }
-})();
 
 class Ripple {
   constructor(x, y, r, duration, rcolor) {
@@ -303,23 +291,23 @@ class Ripple {
     this.stroke = rcolor;
     this.strokeWeight = 3;
 
-    this.duration = duration;   // in milliseconds
+    this.duration = duration; // in milliseconds
     this.startTime = millis();
     this.endTime = this.startTime + this.duration;
   }
 
   draw() {
-    let progress = (this.endTime - millis())/this.duration;
-    let r = this.r*(1 - progress);
+    let progress = (this.endTime - millis()) / this.duration;
+    let r = this.r * (1 - progress);
 
     push();
-      stroke(red(this.stroke), 
-             green(this.stroke), 
-             blue(this.stroke), 
-             255*progress);
-      strokeWeight(this.strokeWeight);
-      fill(0, 0);
-      ellipse(this.x, this.y, r);
+    stroke(red(this.stroke),
+      green(this.stroke),
+      blue(this.stroke),
+      255 * progress);
+    strokeWeight(this.strokeWeight);
+    fill(0, 0);
+    ellipse(this.x, this.y, r);
     pop();
 
     if (millis() > this.endTime) {
