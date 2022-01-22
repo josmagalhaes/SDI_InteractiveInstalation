@@ -29,7 +29,7 @@ function windowResized() {
 
 function draw() {
   background(0);
-  displayAddress();
+  //displayAddress();
 }
 
 
