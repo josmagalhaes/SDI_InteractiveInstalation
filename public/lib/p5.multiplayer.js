@@ -88,6 +88,8 @@ function onHostConnect(data) {
     roomId = data.roomId;
   }
 
+  /*
+
   var qrcode = new QRCode(document.getElementById("qrcode"), {
     text: "http://" + serverIp + ":3000/?=" + roomId,
     width: 128,
@@ -96,6 +98,7 @@ function onHostConnect(data) {
     colorLight: "#ffffff",
     correctLevel: QRCode.CorrectLevel.H
   });
+  */
 }
 
 // Displays server address in lower left of screen
