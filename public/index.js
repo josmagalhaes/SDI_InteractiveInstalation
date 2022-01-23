@@ -36,6 +36,11 @@ function draw() {
 window.addEventListener('deviceorientation', function (ev) {
   console.info(ev.alpha, ev.beta, ev.gamma);
   console.log(ev.alpha);
+  sendData('deviceorientation', {
+    alpha: ev.alpha,
+    beta: ev.beta,
+    gamma: ev.gamma
+  });
 })
 
 window.addEventListener('devicemotion', function (ev) {

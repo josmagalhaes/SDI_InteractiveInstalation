@@ -101,7 +101,7 @@ function onHostConnect(data) {
 // Displays server address in lower left of screen
 function displayAddress() {
   if (document.getElementById("url").innerHTML === "") {
-    document.getElementById("url").innerHTML = "Instance: " + serverIp + ":" + serverPort +  "/?=" + roomId;
+    document.getElementById("url").innerHTML = "Instance: <a style='color:#4da5ff;' href='http://" + serverIp + ":" + serverPort +  "/?=" + roomId + "' target=_blank>" + serverIp + ":" + serverPort +  "/?=" + roomId + "</a>";
   }
 
 }
