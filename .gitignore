@@ -8,5 +8,5 @@ node_modules
 host_2.js
 index_2.js
 .clang-format
-
+.vscode
 
