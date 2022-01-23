@@ -1,11 +1,22 @@
 
+// networking and game object
 const serverIp = "192.168.0.3";
 const serverPort = '3000';
 const local = true;
 let game;
 
+// global canvas
 const screen_width = 512;
 const screen_height = 512;
+
+// enable to debug
+const debug = false;
+p5.disableFriendlyErrors = (debug == false) ? true : false;
+
+// QR code related stuff
+let qr_img;
+// an HTML div to display it in:
+let tagDiv;
 
 function preload() {
   setupHost();
@@ -16,11 +27,15 @@ function setup() {
   console.log('Initializing...');
   createCanvas(windowWidth, windowHeight);
 
-  game = new Game(screen_width, screen_height, WEBGL);
-}
+  // qrcode for server, room
+  qr_img = generate_qrcode(room_url(), 4, 6);
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+  // create the HTML tag div
+  tagDiv = createDiv();
+  tagDiv.position(screen_width - 100, screen_height - 100);
+
+  // Host/Game setup here. ---->
+  game = new Game(screen_width, screen_height, WEBGL);
 }
 
 function draw() {
@@ -28,8 +43,11 @@ function draw() {
 
   if (isHostConnected(display = true)) {
     // Display server address
-    displayAddress();
+    //displayAddress();
   }
+
+  displayCustomAddress(color(255, 180), 12, 10, screen_height - 14);
+  tagDiv.html(qr_img);
 
 }
 
@@ -56,6 +74,35 @@ function onClientDisconnect(data) {
   }
 
   // <----
+}
+
+// Displays server address in lower left of screen
+function room_url(roomid = null)
+{
+    if (roomid != null)
+        return `${serverIp}/?=${roomId}`;
+
+    return `${serverIp}/?=gold`;
+}
+
+function generate_qrcode(qr_input_string, margin, size)
+{
+    // qrcode for server, room
+    // const qr_input_string = room_url();
+    let qr = qrcode(0, "L");
+    qr.addData(qr_input_string);
+    qr.make();
+    const qr_img = qr.createImgTag(margin, size, "qr code");
+    return qr_img;
+}
+
+function displayCustomAddress(textcolor, font_size, xpos, ypos)
+{
+    push();
+    fill(textcolor);
+    textSize(font_size);
+    text(`Enter the room at : ${serverIp}/?=${roomId} or scan the QR code`, xpos, ypos);
+    pop();
 }
 
 function onReceiveData(data) {
@@ -283,3 +330,7 @@ class Ripple {
     return false;
   }
 }
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+  }
