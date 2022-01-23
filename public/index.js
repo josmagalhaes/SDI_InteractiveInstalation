@@ -66,6 +66,7 @@ function setup()
         setuplogger();
     }
     // windowWidth, windowHeight, works with resized window
+    // USE: deviceOrientation for: "portrait" | "landscape"
     let canvas = createCanvas(screen_width, screen_height, WEBGL);
     canvas.position(0, 0);
     background(0);
@@ -95,6 +96,8 @@ function setup()
     // shake threshold, default 30, above which, acceleration triggers
     // deviceShake() call
     setShakeThreshold(30);
+    // same for motion threshold
+    setMoveThreshold(0.5); // default is 0.5
 }
 
 function draw()
