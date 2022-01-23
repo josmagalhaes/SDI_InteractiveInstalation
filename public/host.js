@@ -45,7 +45,7 @@ function setup()
         console.log('Initializing...');
         setuplogger();
     }
-    let canvas = createCanvas(screen_width, screen_height);
+    let canvas = createCanvas(screen_width, screen_height, WEBGL);
     canvas.position(0, 0);
     
     angleMode(RADIANS);

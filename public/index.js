@@ -56,6 +56,17 @@ else
     motion = true;
 }
 
+function set_player_colors()
+{
+    let hue = random(0, 360);
+    colorMode(HSB);
+    player_color     = color(hue, 100, 100);
+    player_color_dim = color(hue, 100, 80);
+    colorMode(RGB);
+    return {"active_color" : player_color, "dimmed_color" : player_color_dim};
+}
+
+
 function preload()
 {
     setupClient();
@@ -107,7 +118,7 @@ function draw()
 {
     background(player_colors["dimmed_color"], 50);
 
-    if (isClientConnected(display = true))
+    if (isClientConnected())
     {
         fill(255);
         textAlign(CENTER, CENTER);
