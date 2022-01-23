@@ -27,15 +27,14 @@ function setup() {
   console.log('Initializing...');
   createCanvas(windowWidth, windowHeight);
 
+  // Host/Game setup here. ---->
+  game = new Game(screen_width, screen_height, WEBGL);
+
   // qrcode for server, room
   qr_img = generate_qrcode(room_url(), 4, 6);
-
   // create the HTML tag div
   tagDiv = createDiv();
   tagDiv.position(screen_width - 100, screen_height - 100);
-
-  // Host/Game setup here. ---->
-  game = new Game(screen_width, screen_height, WEBGL);
 }
 
 function draw() {
@@ -77,12 +76,12 @@ function onClientDisconnect(data) {
 }
 
 // Displays server address in lower left of screen
-function room_url(roomid = null)
+function room_url(roomId = null)
 {
-    if (roomid != null)
-        return `${serverIp}/?=${roomId}`;
+    if (roomId == null || roomId === "undefined")
+        return `${serverIp}:${serverPort}/?=sdi4`;
 
-    return `${serverIp}/?=gold`;
+    return `${serverIp}:${serverPort}/?=${roomId}`;
 }
 
 function generate_qrcode(qr_input_string, margin, size)
@@ -101,7 +100,7 @@ function displayCustomAddress(textcolor, font_size, xpos, ypos)
     push();
     fill(textcolor);
     textSize(font_size);
-    text(`Enter the room at : ${serverIp}/?=${roomId} or scan the QR code`, xpos, ypos);
+    text(`Enter the room at : ${serverIp}:${serverPort}/?=${roomId} or scan the QR code`, xpos, ypos);
     pop();
 }
 
