@@ -30,14 +30,17 @@ let ios    = false;
 // A click is needed for the device to request permission
 if (typeof DeviceMotionEvent.requestPermission === "function")
 {
-    document.body.addEventListener("click", function() {
+    document.body.addEventListener("click", function()
+    {
         DeviceMotionEvent.requestPermission()
-            .then(function() {
+            .then(function()
+            {
                 console.log("DeviceMotionEvent enabled");
                 motion = true;
                 ios    = true;
             })
-            .catch(function(error) {
+            .catch(function(error)
+            {
                 console.warn("DeviceMotionEvent not enabled", error);
             })
     })
@@ -113,7 +116,8 @@ function draw()
         // NOTE: rotationX,Y,Z are in degrees, but we set angle mode to
         //       radians, so convert the input
 
-        let device_motion = {
+        let device_motion =
+        {
             "z_motion" :
                 Math.round(width / 5 * Math.abs(radians(rotationZ) - PI)),
             "y_motion" : Math.round(half_height + rotationX * 10),
@@ -132,7 +136,8 @@ function draw()
         circle(
             device_motion.x_motion,
             device_motion.y_motion,
-            device_motion.z_motion);
+            device_motion.z_motion
+            );
 
         // reference circle
         stroke(255);
@@ -148,19 +153,14 @@ function draw()
         fill(255, 100, 50);
         text("click to start on iOS", 10, 80);
         text("on a mobile: twist, and tilt your device", 10, 120);
-        text(
-            "device - x: " + round(rotationX) + ", y: " + round(rotationX)
-                + ", z: " + round(rotationZ),
-            10,
-            160);
+        text("device - x: " + round(rotationX) +
+                ", y: " + round(rotationX) +
+                ", z: " + round(rotationZ), 10, 160);
 
-        text(
-            "circle - x: " + xMotion + ", y: " + yMotion
-                + ", radius: " + zMotion,
-            10,
-            200);
+        text("circle - x: " + xMotion +
+                ", y: " + yMotion +
+                ", radius: " + zMotion, 10, 200);
     }
-}
 }
 
 function onReceiveData(data)
