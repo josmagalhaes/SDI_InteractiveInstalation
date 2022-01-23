@@ -58,6 +58,17 @@ function draw() {
   // ATTENTION: apparently one MUST call in Z,X,Y order (!?!) or
   //            expect undefined behaviour (... i don't wanna know)
   //
+  accx = map(accelerationX, -90, 90, 0.0, 1.0);
+  accy = map(accelerationY, -90, 90, 0.0, 1.0);
+  accz = map(accelerationZ, -90, 90, 0.0, 1.0);
+
+  rotz = constrain(rotationZ, -TWO_PI, TWO_PI);
+  rotx = constrain(rotationX, -TWO_PI, TWO_PI);
+  roty = constrain(rotationY, -TWO_PI, TWO_PI);
+
+  console.log("Rot Z = " + rotz + ", X = " + rotx + ", Y " + roty);
+  //console.log("Acc X = " + accx + ", Y = " + accy + ", Z = " + accz);
+  
   if (rotz != 0 || rotx != 0 || roty != 0)
   {
     text(`Z rotation = ${rotz}, X rotation${rotx}, Y rotation${roty}`);
@@ -96,7 +107,7 @@ function onReceiveData(data) {
 // called every time the user touches screen or clicks
 function touchMoved()
 {
-  console.log(`Touched at X = ${mouseX}, Y = ${mouseY}`);
+  //console.log(`Touched at X = ${mouseX}, Y = ${mouseY}`);
 }
 
 // default threshold of 0.5 for device motion on X,Y,Z
@@ -104,11 +115,5 @@ function deviceMoved()
 {
   device_motion_value = constrain(device_motion_value + 5, 0, 255);
 
-  accx = map(accelerationX, -90, 90, 0.0, 1.0);
-  accy = map(accelerationY, -90, 90, 0.0, 1.0);
-  accz = map(accelerationZ, -90, 90, 0.0, 1.0);
 
-  rotz = constrain(rotationZ, -TWO_PI, TWO_PI);
-  rotx = constrain(rotationX, -TWO_PI, TWO_PI);
-  roty = constrain(rotationY, -TWO_PI, TWO_PI);
 }
