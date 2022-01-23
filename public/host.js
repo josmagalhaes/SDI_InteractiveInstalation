@@ -1,6 +1,11 @@
-const serverIp = '10.0.0.23';
+
+const serverIp = "192.168.0.3";
 const serverPort = '3000';
 const local = true;
+let game;
+
+const screen_width = 512;
+const screen_height = 512;
 
 function preload() {
   setupHost();
@@ -10,6 +15,8 @@ function setup() {
   setuplogger();
   console.log('Initializing...');
   createCanvas(windowWidth, windowHeight);
+
+  game = new Game(screen_width, screen_height, WEBGL);
 }
 
 function windowResized() {

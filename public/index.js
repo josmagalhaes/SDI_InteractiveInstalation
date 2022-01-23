@@ -1,4 +1,5 @@
-const serverIp = '10.0.0.23';
+
+const serverIp = "192.168.0.3";
 const serverPort = '3000';
 const local = true; // true if running locally, false
 // if running on remote server

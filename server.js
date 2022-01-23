@@ -1,3 +1,4 @@
+
 // Create dictionaries for tracking hosts, clients, and rooms
 let hosts   = {};
 let clients = {};
@@ -8,7 +9,7 @@ let rooms   = {};
 let express = require('express');
 let app = express();
 let port=Number(process.env.PORT || 3000);
-let server = app.listen(port,"10.0.0.23");
+let server = app.listen(port,"192.168.0.3");
 
 app.use(express.static('public'));
 console.log("My socket server is running on port " + port);
@@ -183,7 +184,8 @@ function getKeyByValue(object, value) {
 
 ////////////
 // Gemstone room ID generator
-const roomNames =
+const roomNames = ["sdi4"]
+/*
    ["agate",
     "amber",
     "amethyst",
@@ -214,6 +216,7 @@ const roomNames =
     "topaz",
     "turquoise",
     "zircon"]
+*/
 
 const roomIds = randomNoRepeats(roomNames);
 
