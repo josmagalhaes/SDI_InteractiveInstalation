@@ -171,7 +171,7 @@ function onReceiveData(data)
         // inclination
         processDeviceSensors(data);
     }
-    else if (data.type === "touch_and_drag")
+    else if (data.type === "touch_drag")
     {
         processTouchDrag(data);
     }
