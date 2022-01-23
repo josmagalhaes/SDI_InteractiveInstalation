@@ -5,4 +5,8 @@ node_modules
 *~
 .*.swp
 .*.bak
+host_2.js
+index_2.js
+.clang-format
+
 

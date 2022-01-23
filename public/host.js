@@ -1,79 +1,115 @@
 
 // networking and game object
-const serverIp = "192.168.0.3";
+const serverIp   = "192.168.0.3";
 const serverPort = '3000';
-const local = true;
+const local      = true;
 let game;
 
 // global canvas
-const screen_width = 512;
+const screen_width  = 512;
 const screen_height = 512;
+const half_width = screen_width / 2;
+const half_height = screen_height / 2;
+const frame_rate    = 25;
 
 // enable to debug
-const debug = false;
-p5.disableFriendlyErrors = (debug == false) ? true : false;
+const debug              = false;
+p5.disableFriendlyErrors = true;
 
 // QR code related stuff
 let qr_img;
 // an HTML div to display it in:
 let tagDiv;
 
-function preload() {
-  setupHost();
+
+// some auxiliary functions
+const square = (x) => x * x;
+const hypot = (x, y) => Math.sqrt(square(x) + square(y));
+const clamp = (x, mi, ma) => Math.min(Math.max(mi, x), ma);
+
+
+function preload()
+{
+    setupHost();
 }
 
-function setup() {
-  setuplogger();
-  console.log('Initializing...');
-  createCanvas(windowWidth, windowHeight);
+function setup()
+{
+    if (debug)
+    {
+        p5.disableFriendlyErrors = false;
+        console.log('Initializing...');
+        setuplogger();
+    }
+    let canvas = createCanvas(screen_width, screen_height);
+    canvas.position(0, 0);
+    
+    angleMode(RADIANS);
+    frameRate(frame_rate);
+    //blendMode(ADD);
+    background(0);
 
-  // Host/Game setup here. ---->
-  game = new Game(screen_width, screen_height, WEBGL);
+    // Host/Game setup here. ---->
+    game = new Game(screen_width, screen_height, WEBGL);
 
-  // qrcode for server, room
-  qr_img = generate_qrcode(room_url(), 4, 6);
-  // create the HTML tag div
-  tagDiv = createDiv();
-  tagDiv.position(screen_width - 100, screen_height - 100);
+    // qrcode for server, room
+    qr_img = generate_qrcode(room_url(), 4, 6);
+    // create the HTML tag div
+    tagDiv = createDiv();
+    tagDiv.position(screen_width - 100, screen_height - 100);
 }
 
-function draw() {
-  background(0);
+function draw()
+{
+    clear();
+    background(0);
 
-  if (isHostConnected(display = true)) {
-    // Display server address
-    //displayAddress();
+    if (isHostConnected(display = true))
+    {
+        game.printPlayerIds(5, 20);
+
+        // update and draw game objects
+        // game.draw()
+    }
+    // display address and QR code
     displayCustomAddress(color(255, 180), 12, 10, screen_height - 14);
     tagDiv.html(qr_img);
-  }
 }
 
-function onClientConnect(data) {
-  // Client connect logic here. --->
-  console.log(data.id + ' has connected.');
+function onClientConnect(data)
+{
+    // Client connect logic here. --->
+    if (debug)
+    {
+        console.log(data.id + ' has connected.');
+    }
 
-  if (!game.checkId(data.id))
-  {
-    game.add(data.id,
-      random(0.25 * width, 0.75 * width),
-      random(0.25 * height, 0.75 * height),
-      60, 60
-    );
-  }
+    if (!game.checkId(data.id))
+    {
+        game.add(
+            data.id,
+            random(0.25 * width, 0.75 * width),
+            random(0.25 * height, 0.75 * height),
+            60,
+            60);
+    }
 
-  // <----
+    // <----
 }
 
 function onClientDisconnect(data)
 {
-  // Client disconnect logic here. --->
-  if (game.checkId(data.id))
-  {
+    // Client disconnect logic here. --->
+    if (game.checkId(data.id))
+    {
         game.remove(data.id);
-  }
-  // <----
+    }
+    // <----
 }
 
+// TODO: move to utils together with some lambdas above
+//       perhaps networking related, with connection checks above
+//
 // Displays server address in lower left of screen
 function room_url(roomId = null)
 {
@@ -99,127 +135,182 @@ function displayCustomAddress(textcolor, font_size, xpos, ypos)
     push();
     fill(textcolor);
     textSize(font_size);
-    text(`Enter the room at : ${serverIp}:${serverPort}/?=${roomId} or scan the QR code`, xpos, ypos);
+    text(
+        `Enter the room at : ${serverIp}:${serverPort}/?=${
+            roomId} or scan the QR code`,
+        xpos,
+        ypos);
     pop();
 }
 
-function onReceiveData(data) {
-  // Input data processing here. --->
-  console.log(data);
-
-  if (data.type === 'joystick')
-  {
-        processJoystick(data);
-  }
-  else if (data.type === 'button')
-  {
-        processButton(data);
-  }
-  else if (data.type === 'playerColor')
-  {
-        game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
-  }
-
-  // <----
-
-  /* Example:
-     if (data.type === 'myDataType') {
-       processMyData(data);
-     }
-
-     Use `data.type` to get the message type sent by client.
-  */
-}
-
-// This is included for testing purposes to demonstrate that
-// messages can be sent from a host back to all connected clients
-function mousePressed()
+function onReceiveData(data)
 {
-    console.log("Mouse pressed: sending timestamp millis() to client.")
-    sendData("timestamp", {
-        timestamp: millis()
-    });
+    // Input data processing here. --->
+    if (debug)
+    {
+        console.log(data);
+    }
+
+    // acceleration
+    // rotationX, Y, Z
+    // shaken but not stirred
+    // device moved
+    // touch & drag
+    //
+    if (data.type === "joystick")
+    {
+        processJoystick(data);
+    }
+    else if (data.type === "shaken")
+    {
+        processDeviceShake(data);
+    }
+    else if (data.type === "device_moved")
+    {
+        // accelerationX|Y|Z, rotationX|Y|Z
+        // inclination
+        processDeviceSensors(data);
+    }
+    else if (data.type === "touch_and_drag")
+    {
+        processTouchDrag(data);
+    }
+    else if (data.type === "player_color")
+    {
+        game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
+    }
 }
 
 ////////////
 // Input processing
+// TODO: move to own separate class, this is annoying
 function processJoystick(data)
 {
     fill(0, 255, 0);
     text("process joystick data", width / 2, height / 2);
 }
 
-function processButton(data)
+function processDeviceShake(data)
 {
     fill(255, 200, 0);
-    text("process button");
+    text("process device shake");
+}
+
+function processDeviceSensors(data)
+{
+    fill(255, 200, 0);
+    text("process device sensors");
+}
+
+function processTouchDrag(data)
+{
+    fill(255, 200, 0);
+    text("process touch & drag");
+}
+
+function processMouseClick(data)
+{
+    if (data != null)
+    {
+        game.players[data.id].xcoord = data.xcoord;
+        game.players[data.id].ycoord = data.ycoord;
+
+        if (debug)
+        {
+            console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
+        }
+    }
+}
+
+// This is included for testing purposes to demonstrate that
+// messages can be sent from a host back to all connected clients
+function mousePressed()
+{
+    if (debug)
+    {
+        console.log("Mouse pressed: sending timestamp millis() to client.")
+    }
+    sendData("timestamp", {timestamp : millis()});
 }
 
 ////////////
 // Game
 // This simple placeholder game makes use of p5.play
-class Game {
-  constructor(w, h) {
-    this.w = w;
-    this.h = h;
-    this.players = {};
-    this.numPlayers = 0;
-    this.id = 0;
-  }
-
-  add(id, x, y, w, h) {
-    this.players[id].id = "p" + this.id;
-    this.players[id].color = color(255, 255, 255);
-    print(this.players[id].id + " added.");
-    this.id++;
-    this.numPlayers++;
-  }
-
-  draw() {
-      ;
-  }
-
-  setColor(id, r, g, b) {
-    this.players[id].color = color(r, g, b);
-    this.players[id].shapeColor = color(r, g, b);
-
-    print(this.players[id].id + " color added.");
-  }
-
-  remove(id) {
-    this.colliders.remove(this.players[id]);
-    this.players[id].remove();
-    delete this.players[id];
-    this.numPlayers--;
-  }
-
-  checkId(id) {
-    if (id in this.players) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  printPlayerIds(x, y) {
-    push();
-    noStroke();
-    fill(255);
-    textSize(16);
-    text("# players: " + this.numPlayers, x, y);
-
-    y = y + 16;
-    fill(200);
-    for (let id in this.players) {
-      text(this.players[id].id, x, y);
-      y += 16;
+class Game
+{
+    constructor(w, h)
+    {
+        this.w          = w;
+        this.h          = h;
+        this.players    = {};
+        this.numPlayers = 0;
+        this.id         = 0;
     }
 
-    pop();
-  }
+    add(id, x, y, w, h)
+    {
+        this.players[id].id    = "p" + this.id;
+        this.players[id].color = color(255, 255, 255);
+        print(this.players[id].id + " added.");
+        this.id++;
+        this.numPlayers++;
+    }
+
+    draw() { ; }
+
+    setColor(id, r, g, b)
+    {
+        this.players[id].color      = color(r, g, b);
+        this.players[id].shapeColor = color(r, g, b);
+
+        print(this.players[id].id + " color added.");
+    }
+
+    remove(id)
+    {
+        this.colliders.remove(this.players[id]);
+        this.players[id].remove();
+        delete this.players[id];
+        this.numPlayers--;
+    }
+
+    checkId(id)
+    {
+        if (id in this.players)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    printPlayerIds(x, y)
+    {
+        push();
+        noStroke();
+        fill(255);
+        textSize(16);
+        text("# players: " + this.numPlayers, x, y);
+
+        y = y + 16;
+        fill(200);
+        for (let id in this.players)
+        {
+            text(this.players[id].id, x, y);
+            y += 16;
+        }
+
+        pop();
+    }
 }
 
-
-function windowResized() {
+// leave this commented, otherwise the canvas will be resized
+// to the entire window on the host/render window.
+/*
+function windowResized()
+{
     resizeCanvas(windowWidth, windowHeight);
-  }
+}
+*/
