@@ -21,6 +21,9 @@ let qr_img;
 // an HTML div to display it in:
 let tagDiv;
 
+// shaders and glsl related
+let shader_base;
+
 
 // some auxiliary functions
 const square = (x) => x * x;
@@ -31,6 +34,7 @@ const clamp = (x, mi, ma) => Math.min(Math.max(mi, x), ma);
 function preload()
 {
     setupHost();
+    shader_base = loadShader("assets/base.vert", "assets/base.frag");
 }
 
 function setup()
@@ -61,16 +65,27 @@ function setup()
 
 function draw()
 {
-    clear();
-    background(0);
+    // clear();
+    // background(0);
 
     if (isHostConnected(display = true))
     {
-        game.printPlayerIds(5, 20);
-
-        // update and draw game objects
+        // draw() method either contains the shader call or just the
+        // input processing
         // game.draw()
     }
+
+    // NOTE: game.draw() will get the input data processed to pass to shaders
+    shader(shader_base);
+    // rect gives us some geometry on the screen
+    rect(0,0,width, height);
+
+    if (isHostConnected(display = true))
+    {
+        // NOTE: these might have to be moved after the main rect
+        game.printPlayerIds(5, 20);
+    }
+
     // display address and QR code
     displayCustomAddress(color(255, 180), 12, 10, screen_height - 14);
     tagDiv.html(qr_img);
