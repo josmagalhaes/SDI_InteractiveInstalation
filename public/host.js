@@ -14,7 +14,7 @@ const half_height   = screen_height / 2;
 const frame_rate    = 25;
 
 // enable to debug
-const debug              = true;
+const debug              = false;
 p5.disableFriendlyErrors = true;
 
 // QR code related stuff
@@ -47,8 +47,7 @@ function preload()
 function setup()
 {
     const f = (font) => {
-        textFont(font);
-        textSize(200);
+        textFont(font, 200);
         text("hello", 0, 0); // no issue, renders
     };
 
@@ -163,7 +162,7 @@ function displayCustomAddress(textcolor, font_size, xpos, ypos)
 {
     push();
     fill(textcolor);
-    textSize(font_size);
+    textFont(font, font_size);
     text(
         `Enter the room at : ${serverIp}:${serverPort}/?=${
             roomId} or scan the QR code`,
@@ -311,7 +310,7 @@ class Game
         push();
         noStroke();
         fill(255);
-        textSize(16);
+        textFont(font, 16);
         text("# players: " + this.numPlayers, x, y);
 
         y = y + 16;
