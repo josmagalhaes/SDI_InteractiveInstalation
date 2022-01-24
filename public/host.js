@@ -1,7 +1,7 @@
 "use strict";
 
-const sketch = (p) => {
-
+const sketch = (p) =>
+{
     // networking and game object
     const serverIp = "192.168.0.3"; // 10.0.0.23
     const serverPort = '3000';
@@ -35,7 +35,7 @@ const sketch = (p) => {
 
     p.preload = () =>
     {
-        setupHost();
+        p.setupHost();
         shader_base = p.loadShader(
             "assets/base.vert",
             "assets/base.frag"
@@ -47,18 +47,20 @@ const sketch = (p) => {
 
     p.setup = () =>
     {
-        const f = (font) => {
+        const f = (font) =>
+        {
             p.textFont(font, 200);
             p.text("hello", 0, 0); // no issue, renders
         };
 
-        if (debug) {
+        if (debug)
+        {
             p.p5.disableFriendlyErrors = false;
-            console.log('Initializing...');
+            p.console.log('Initializing...');
             setuplogger();
         }
-
-        else {
+        else
+        {
             p.p5.disableFriendlyErrors = true;
         }
         let canvas = p.createCanvas(screen_width, screen_height, WEBGL);
@@ -75,7 +77,7 @@ const sketch = (p) => {
         game = new Game(screen_width, screen_height, WEBGL);
 
         // qrcode for server, room
-        qr_img = generate_qrcode("http://" + room_url(), 4, 6);
+        qr_img = p.generate_qrcode("http://" + room_url(), 4, 6);
         // create the HTML tag div
         tagDiv = p.createDiv();
         tagDiv.position(screen_width - 100, screen_height - 100);
@@ -85,7 +87,8 @@ const sketch = (p) => {
     {
         // clear();
         // background(0);
-        if (isHostConnected( /* display = true */)) {
+        if (p.isHostConnected( /* display = true */))
+        {
             // draw() method either contains the shader call or
             // just the input processing
             // game.draw()
@@ -96,7 +99,8 @@ const sketch = (p) => {
         // rect gives us some geometry on the screen
         p.rect(0, 0, width, height);
 
-        if (isHostConnected( /* display = true */)) {
+        if (p.isHostConnected( /* display = true */))
+        {
             // NOTE: these might have to be moved after the main rect
             game.printPlayerIds(-half_width + 5, -half_height + 20);
         }
@@ -107,11 +111,11 @@ const sketch = (p) => {
         //       The player IDs, etc.. would need to be rendered in GLSL however.
         //
         // display address and QR code
-        displayCustomAddress(color(0, 20, 80, 180), 12, 10 - half_width, half_height - 14);
+        p.displayCustomAddress(color(0, 20, 80, 180), 12, 10 - half_width, half_height - 14);
         tagDiv.html(qr_img);
     }
 
-    function onClientConnect(data)
+    p.onClientConnect = (data) =>
     {
         // Client connect logic here. --->
         if (debug)
@@ -119,7 +123,8 @@ const sketch = (p) => {
             console.log(data.id + ' has connected.');
         }
 
-        if (!game.checkId(data.id)) {
+        if (!game.checkId(data.id))
+        {
             game.add(
                 data.id,
                 p.random(0.25 * width, 0.75 * width),
@@ -127,13 +132,14 @@ const sketch = (p) => {
                 60,
                 60);
         }
-
         // <----
     }
 
-    function onClientDisconnect(data) {
+    p.onClientDisconnect = (data) =>
+    {
         // Client disconnect logic here. --->
-        if (game.checkId(data.id)) {
+        if (game.checkId(data.id))
+        {
             game.remove(data.id);
         }
         // <----
@@ -143,14 +149,16 @@ const sketch = (p) => {
     //       perhaps networking related, with connection checks above
     //
     // Displays server address in lower left of screen
-    function room_url(roomId = null) {
+    p.room_url = (roomId = null) =>
+    {
         if (roomId == null || roomId === "undefined")
             return `${serverIp}:${serverPort}/?=sdi4`;
 
         return `${serverIp}:${serverPort}/?=${roomId}`;
     }
 
-    function generate_qrcode(qr_input_string, margin, size) {
+    p.generate_qrcode = (qr_input_string, margin, size) =>
+    {
         // qrcode for server, room
         // const qr_input_string = room_url();
         let qr = qrcode(0, "L");
@@ -160,7 +168,8 @@ const sketch = (p) => {
         return qr_img;
     }
 
-    function displayCustomAddress(textcolor, font_size, xpos, ypos) {
+    p.displayCustomAddress = (textcolor, font_size, xpos, ypos) =>
+    {
         p.push();
         p.fill(textcolor);
         p.textFont(font, font_size);
@@ -171,11 +180,12 @@ const sketch = (p) => {
         p.pop();
     }
 
-    p.onReceiveData  = (data) =>
+    p.onReceiveData = (data) =>
     {
         // Input data processing here. --->
-        if (debug) {
-            console.log(data);
+        if (debug)
+        {
+            p.console.log(data);
         }
 
         // acceleration
@@ -184,21 +194,26 @@ const sketch = (p) => {
         // device moved
         // touch & drag
         //
-        if (data.type === "joystick") {
+        if (data.type === "joystick")
+        {
             p.processJoystick(data);
         }
-        else if (data.type === "shaken") {
+        else if (data.type === "shaken")
+        {
             p.processDeviceShake(data);
         }
-        else if (data.type === "device_moved") {
+        else if (data.type === "device_moved")
+        {
             // accelerationX|Y|Z, rotationX|Y|Z
             // inclination
             p.processDeviceSensors(data);
         }
-        else if (data.type === "touch_drag") {
+        else if (data.type === "touch_drag")
+        {
             p.processTouchDrag(data);
         }
-        else if (data.type === "player_color") {
+        else if (data.type === "player_color")
+        {
             game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
         }
     }
@@ -224,20 +239,22 @@ const sketch = (p) => {
         p.text("process device sensors");
     }
 
-    p.processTouchDrag  = (data) =>
+    p.processTouchDrag = (data) =>
     {
         p.fill(255, 200, 0);
         p.text("process touch & drag");
     }
 
-    p.processMouseClick  = (data) =>
+    p.processMouseClick = (data) =>
     {
-        if (data != null) {
+        if (data != null)
+        {
             game.players[data.id].xcoord = data.xcoord;
             game.players[data.id].ycoord = data.ycoord;
 
-            if (debug) {
-                console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
+            if (debug)
+            {
+                p.console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
             }
         }
     }
@@ -246,8 +263,9 @@ const sketch = (p) => {
     // messages can be sent from a host back to all connected clients
     p.mousePressed = () =>
     {
-        if (debug) {
-            console.log("Mouse pressed: sending timestamp millis() to client.");
+        if (debug)
+        {
+            p.console.log("Mouse pressed: sending timestamp millis() to client.");
         }
         p.sendData("timestamp", { timestamp: p.millis() });
     }
