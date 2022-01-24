@@ -65,6 +65,7 @@ function setup()
     frameRate(frame_rate);
     // blendMode(ADD);
     background(0);
+    
 
     // Host/Game setup here. ---->
     game = new Game(screen_width, screen_height, WEBGL);
@@ -89,18 +90,18 @@ function draw()
     }
 
     // NOTE: game.draw() will get the input data processed to pass to shaders
-    shader(shader_base);
+    //shader(shader_base);
     // rect gives us some geometry on the screen
-    rect(0, 0, width, height);
+    //rect(0, 0, width, height);
 
     if (isHostConnected(/* display = true */))
     {
         // NOTE: these might have to be moved after the main rect
-        game.printPlayerIds(5, 20);
+        game.printPlayerIds(-half_width + 5, -half_height + 20);
     }
 
     // display address and QR code
-    displayCustomAddress(color(0, 20, 80, 180), 12, 10, screen_height - 14);
+    displayCustomAddress(color(0, 20, 80, 180), 12, 10 - half_width, half_height - 14);
     tagDiv.html(qr_img);
 }
 
@@ -164,7 +165,7 @@ function displayCustomAddress(textcolor, font_size, xpos, ypos)
     fill(textcolor);
     textFont(font, font_size);
     text(
-        `Enter the room at : ${serverIp}:${serverPort}/?=${
+        `URL : ${serverIp}:${serverPort}/?=${
             roomId} or scan the QR code`,
         xpos,
         ypos);
