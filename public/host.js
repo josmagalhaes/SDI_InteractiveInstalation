@@ -35,7 +35,7 @@ const sketch = (p) =>
 
     p.preload = () =>
     {
-        p.setupHost();
+        setupHost();
         shader_base = p.loadShader(
             "assets/base.vert",
             "assets/base.frag"
@@ -56,7 +56,7 @@ const sketch = (p) =>
         if (debug)
         {
             p.p5.disableFriendlyErrors = false;
-            p.console.log('Initializing...');
+            console.log('Initializing...');
             setuplogger();
         }
         else
@@ -185,7 +185,7 @@ const sketch = (p) =>
         // Input data processing here. --->
         if (debug)
         {
-            p.console.log(data);
+            console.log(data);
         }
 
         // acceleration
@@ -254,7 +254,7 @@ const sketch = (p) =>
 
             if (debug)
             {
-                p.console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
+                console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
             }
         }
     }
@@ -265,9 +265,9 @@ const sketch = (p) =>
     {
         if (debug)
         {
-            p.console.log("Mouse pressed: sending timestamp millis() to client.");
+            console.log("Mouse pressed: sending timestamp millis() to client.");
         }
-        p.sendData("timestamp", { timestamp: p.millis() });
+        sendData("timestamp", { timestamp: p.millis() });
     }
 
     ////////////
@@ -339,3 +339,5 @@ const sketch = (p) =>
     }
     */
 }
+
+new p5(sketch, document.getElementById("p5sketch"));
