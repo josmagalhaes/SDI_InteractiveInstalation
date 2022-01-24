@@ -139,7 +139,7 @@ const sketch = (p) =>
         // <----
     }
 
-    onClientDisconnect(data)
+    p.onClientDisconnect = (data) =>
     {
         // Client disconnect logic here. --->
         if (game.checkId(data.id))
