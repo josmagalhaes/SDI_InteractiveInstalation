@@ -1,47 +1,59 @@
+"use strict";
+
 // networking and game object
-const serverIp = "10.0.0.23";
+const serverIp   = "192.168.0.3"; // 10.0.0.23
 const serverPort = '3000';
-const local = true;
+const local      = true;
 let game;
 
 // global canvas
-const screen_width = 512;
+const screen_width  = 512;
 const screen_height = 512;
-const half_width = screen_width / 2;
-const half_height = screen_height / 2;
-const frame_rate = 25;
+const half_width    = screen_width / 2;
+const half_height   = screen_height / 2;
+const frame_rate    = 25;
 
 // enable to debug
-const debug = true;
+const debug              = true;
 p5.disableFriendlyErrors = true;
 
 // QR code related stuff
 let qr_img;
 // an HTML div to display it in:
 let tagDiv;
+// font related
+let font;
 
 // shaders and glsl related
 let shader_base;
-
 
 // some auxiliary functions
 const square = (x) => x * x;
 const hypot = (x, y) => Math.sqrt(square(x) + square(y));
 const clamp = (x, mi, ma) => Math.min(Math.max(mi, x), ma);
 
-
-function preload() {
+function preload()
+{
     setupHost();
-    shader_base = loadShader("assets/base.vert", "assets/base.frag");
+    shader_base = loadShader(
+        "assets/base.vert",
+        "assets/base.frag",
+    );
+    // fonts must be loaded and set before drawing text
+    // WebGL text() https://github.com/processing/p5.js/wiki/Getting-started-with-WebGL-in-p5
+    font = loadFont("assets/RobotoMono-Regular.ttf");
 }
 
-function setup() {
-    f = loadFont("RobotoMono-Regular.ttf", function () {
-        textFont(f, 200);
+function setup()
+{
+    const f = (font) => {
+        textFont(font);
+        textSize(200);
         text("hello", 0, 0); // no issue, renders
-    });
+    };
 
-    if (debug) {
+    if (debug)
+    {
         p5.disableFriendlyErrors = false;
         console.log('Initializing...');
         setuplogger();
@@ -52,7 +64,7 @@ function setup() {
 
     angleMode(RADIANS);
     frameRate(frame_rate);
-    //blendMode(ADD);
+    // blendMode(ADD);
     background(0);
 
     // Host/Game setup here. ---->
@@ -65,13 +77,15 @@ function setup() {
     tagDiv.position(screen_width - 100, screen_height - 100);
 }
 
-function draw() {
+function draw()
+{
     // clear();
     // background(0);
 
-    if (isHostConnected(display = true)) {
-        // draw() method either contains the shader call or just the
-        // input processing
+    if (isHostConnected(/* display = true */))
+    {
+        // draw() method either contains the shader call or
+        // just the input processing
         // game.draw()
     }
 
@@ -80,23 +94,27 @@ function draw() {
     // rect gives us some geometry on the screen
     rect(0, 0, width, height);
 
-    if (isHostConnected(display = true)) {
+    if (isHostConnected(/* display = true */))
+    {
         // NOTE: these might have to be moved after the main rect
         game.printPlayerIds(5, 20);
     }
 
     // display address and QR code
-    displayCustomAddress(color(255, 180), 12, 10, screen_height - 14);
+    displayCustomAddress(color(0, 20, 80, 180), 12, 10, screen_height - 14);
     tagDiv.html(qr_img);
 }
 
-function onClientConnect(data) {
+function onClientConnect(data)
+{
     // Client connect logic here. --->
-    if (debug) {
+    if (debug)
+    {
         console.log(data.id + ' has connected.');
     }
 
-    if (!game.checkId(data.id)) {
+    if (!game.checkId(data.id))
+    {
         game.add(
             data.id,
             random(0.25 * width, 0.75 * width),
@@ -108,9 +126,11 @@ function onClientConnect(data) {
     // <----
 }
 
-function onClientDisconnect(data) {
+function onClientDisconnect(data)
+{
     // Client disconnect logic here. --->
-    if (game.checkId(data.id)) {
+    if (game.checkId(data.id))
+    {
         game.remove(data.id);
     }
     // <----
@@ -120,14 +140,16 @@ function onClientDisconnect(data) {
 //       perhaps networking related, with connection checks above
 //
 // Displays server address in lower left of screen
-function room_url(roomId = null) {
+function room_url(roomId = null)
+{
     if (roomId == null || roomId === "undefined")
         return `${serverIp}:${serverPort}/?=sdi4`;
 
     return `${serverIp}:${serverPort}/?=${roomId}`;
 }
 
-function generate_qrcode(qr_input_string, margin, size) {
+function generate_qrcode(qr_input_string, margin, size)
+{
     // qrcode for server, room
     // const qr_input_string = room_url();
     let qr = qrcode(0, "L");
@@ -137,7 +159,8 @@ function generate_qrcode(qr_input_string, margin, size) {
     return qr_img;
 }
 
-function displayCustomAddress(textcolor, font_size, xpos, ypos) {
+function displayCustomAddress(textcolor, font_size, xpos, ypos)
+{
     push();
     fill(textcolor);
     textSize(font_size);
@@ -149,9 +172,11 @@ function displayCustomAddress(textcolor, font_size, xpos, ypos) {
     pop();
 }
 
-function onReceiveData(data) {
+function onReceiveData(data)
+{
     // Input data processing here. --->
-    if (debug) {
+    if (debug)
+    {
         console.log(data);
     }
 
@@ -161,17 +186,26 @@ function onReceiveData(data) {
     // device moved
     // touch & drag
     //
-    if (data.type === "joystick") {
+    if (data.type === "joystick")
+    {
         processJoystick(data);
-    } else if (data.type === "shaken") {
+    }
+    else if (data.type === "shaken")
+    {
         processDeviceShake(data);
-    } else if (data.type === "device_moved") {
+    }
+    else if (data.type === "device_moved")
+    {
         // accelerationX|Y|Z, rotationX|Y|Z
         // inclination
         processDeviceSensors(data);
-    } else if (data.type === "touch_drag") {
+    }
+    else if (data.type === "touch_drag")
+    {
         processTouchDrag(data);
-    } else if (data.type === "player_color") {
+    }
+    else if (data.type === "player_color")
+    {
         game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
     }
 }
@@ -179,95 +213,101 @@ function onReceiveData(data) {
 ////////////
 // Input processing
 // TODO: move to own separate class, this is annoying
-function processJoystick(data) {
+function processJoystick(data)
+{
     fill(0, 255, 0);
     text("process joystick data", width / 2, height / 2);
 }
 
-function processDeviceShake(data) {
+function processDeviceShake(data)
+{
     fill(255, 200, 0);
     text("process device shake");
 }
 
-function processDeviceSensors(data) {
+function processDeviceSensors(data)
+{
     fill(255, 200, 0);
     text("process device sensors");
 }
 
-function processTouchDrag(data) {
+function processTouchDrag(data)
+{
     fill(255, 200, 0);
     text("process touch & drag");
 }
 
-function processMouseClick(data) {
-    if (data != null) {
+function processMouseClick(data)
+{
+    if (data != null)
+    {
         game.players[data.id].xcoord = data.xcoord;
         game.players[data.id].ycoord = data.ycoord;
 
-        if (debug) {
-            console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
+        if (debug)
+        {
+            console.log(`${data.id} XY received: X = ${data.xcoord}, ${
+                data.id} Y = ${data.ycoord}`);
         }
     }
 }
 
 // This is included for testing purposes to demonstrate that
 // messages can be sent from a host back to all connected clients
-function mousePressed() {
-    if (debug) {
+function mousePressed()
+{
+    if (debug)
+    {
         console.log("Mouse pressed: sending timestamp millis() to client.")
     }
-    sendData("timestamp", {
-        timestamp: millis()
-    });
+    sendData("timestamp", {timestamp : millis()});
 }
 
 ////////////
 // Game
 // This simple placeholder game makes use of p5.play
-class Game {
-    constructor(w, h) {
-        this.w = w;
-        this.h = h;
-        this.players = {};
+class Game
+{
+    constructor(w, h)
+    {
+        this.w          = w;
+        this.h          = h;
+        this.players    = {};
         this.numPlayers = 0;
-        this.id = 0;
+        this.id         = 0;
     }
 
-    add(id, x, y, w, h) {
-        this.players[id].id = "p" + this.id;
+    add(id, x, y, w, h)
+    {
+        this.players[id].id    = "p" + this.id;
         this.players[id].color = color(255, 255, 255);
         print(this.players[id].id + " added.");
         this.id++;
         this.numPlayers++;
     }
 
-    draw() {
-        ;
-    }
+    draw() { ; }
 
-    setColor(id, r, g, b) {
-        this.players[id].color = color(r, g, b);
+    setColor(id, r, g, b)
+    {
+        this.players[id].color      = color(r, g, b);
         this.players[id].shapeColor = color(r, g, b);
 
         print(this.players[id].id + " color added.");
     }
 
-    remove(id) {
+    remove(id)
+    {
         this.colliders.remove(this.players[id]);
         this.players[id].remove();
         delete this.players[id];
         this.numPlayers--;
     }
 
-    checkId(id) {
-        if (id in this.players) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    checkId(id) { return (id in this.players) ? true : false; }
 
-    printPlayerIds(x, y) {
+    printPlayerIds(x, y)
+    {
         push();
         noStroke();
         fill(255);
@@ -276,7 +316,8 @@ class Game {
 
         y = y + 16;
         fill(200);
-        for (let id in this.players) {
+        for (let id in this.players)
+        {
             text(this.players[id].id, x, y);
             y += 16;
         }
