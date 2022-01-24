@@ -1,4 +1,8 @@
+
 "use strict";
+
+//get container for our canvas
+const sketchContainer = document.getElementById("sketch-container");
 
 const sketch = (p) =>
 {
@@ -77,7 +81,7 @@ const sketch = (p) =>
         game = new Game(screen_width, screen_height, WEBGL);
 
         // qrcode for server, room
-        qr_img = p.generate_qrcode("http://" + room_url(), 4, 6);
+        qr_img = generate_qrcode("http://" + room_url(), 4, 6);
         // create the HTML tag div
         tagDiv = p.createDiv();
         tagDiv.position(screen_width - 100, screen_height - 100);
@@ -87,7 +91,7 @@ const sketch = (p) =>
     {
         // clear();
         // background(0);
-        if (p.isHostConnected( /* display = true */))
+        if (isHostConnected( /* display = true */))
         {
             // draw() method either contains the shader call or
             // just the input processing
@@ -99,7 +103,7 @@ const sketch = (p) =>
         // rect gives us some geometry on the screen
         p.rect(0, 0, width, height);
 
-        if (p.isHostConnected( /* display = true */))
+        if (isHostConnected( /* display = true */))
         {
             // NOTE: these might have to be moved after the main rect
             game.printPlayerIds(-half_width + 5, -half_height + 20);
@@ -111,11 +115,11 @@ const sketch = (p) =>
         //       The player IDs, etc.. would need to be rendered in GLSL however.
         //
         // display address and QR code
-        p.displayCustomAddress(color(0, 20, 80, 180), 12, 10 - half_width, half_height - 14);
+        displayCustomAddress(color(0, 20, 80, 180), 12, 10 - half_width, half_height - 14);
         tagDiv.html(qr_img);
     }
 
-    p.onClientConnect = (data) =>
+    function onClientConnect(data)
     {
         // Client connect logic here. --->
         if (debug)
@@ -135,7 +139,7 @@ const sketch = (p) =>
         // <----
     }
 
-    p.onClientDisconnect = (data) =>
+    onClientDisconnect(data)
     {
         // Client disconnect logic here. --->
         if (game.checkId(data.id))
@@ -149,7 +153,7 @@ const sketch = (p) =>
     //       perhaps networking related, with connection checks above
     //
     // Displays server address in lower left of screen
-    p.room_url = (roomId = null) =>
+    function room_url(roomId = null)
     {
         if (roomId == null || roomId === "undefined")
             return `${serverIp}:${serverPort}/?=sdi4`;
@@ -157,7 +161,7 @@ const sketch = (p) =>
         return `${serverIp}:${serverPort}/?=${roomId}`;
     }
 
-    p.generate_qrcode = (qr_input_string, margin, size) =>
+    function generate_qrcode(qr_input_string, margin, size)
     {
         // qrcode for server, room
         // const qr_input_string = room_url();
@@ -168,7 +172,7 @@ const sketch = (p) =>
         return qr_img;
     }
 
-    p.displayCustomAddress = (textcolor, font_size, xpos, ypos) =>
+    function displayCustomAddress(textcolor, font_size, xpos, ypos)
     {
         p.push();
         p.fill(textcolor);
@@ -180,7 +184,7 @@ const sketch = (p) =>
         p.pop();
     }
 
-    p.onReceiveData = (data) =>
+    function onReceiveData(data)
     {
         // Input data processing here. --->
         if (debug)
@@ -196,21 +200,21 @@ const sketch = (p) =>
         //
         if (data.type === "joystick")
         {
-            p.processJoystick(data);
+            processJoystick(data);
         }
         else if (data.type === "shaken")
         {
-            p.processDeviceShake(data);
+            processDeviceShake(data);
         }
         else if (data.type === "device_moved")
         {
             // accelerationX|Y|Z, rotationX|Y|Z
             // inclination
-            p.processDeviceSensors(data);
+            processDeviceSensors(data);
         }
         else if (data.type === "touch_drag")
         {
-            p.processTouchDrag(data);
+            processTouchDrag(data);
         }
         else if (data.type === "player_color")
         {
@@ -221,31 +225,31 @@ const sketch = (p) =>
     ////////////
     // Input processing
     // TODO: move to own separate class, this is annoying
-    p.processJoystick = (data) =>
+    function processJoystick(data)
     {
         p.fill(0, 255, 0);
         p.text("process joystick data", width / 2, height / 2);
     }
 
-    p.processDeviceShake = (data) =>
+    function processDeviceShake(data)
     {
         p.fill(255, 200, 0);
         p.text("process device shake");
     }
 
-    p.processDeviceSensors = (data) =>
+    function processDeviceSensors(data)
     {
         p.fill(255, 200, 0);
         p.text("process device sensors");
     }
 
-    p.processTouchDrag = (data) =>
+    function processTouchDrag(data)
     {
         p.fill(255, 200, 0);
         p.text("process touch & drag");
     }
 
-    p.processMouseClick = (data) =>
+    function processMouseClick(data)
     {
         if (data != null)
         {
