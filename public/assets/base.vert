@@ -2,6 +2,20 @@
 precision mediump float;
 #endif
 
+/*
+uniform - unchanging values (uniform) for all triangles.
+attribute - vertex attributes. each vertex has different values for each of these. 
+these are the INPUTs for the vertex shader.
+varying - these are the values that are interpolated (vary) between the vertices of
+ a triangle. these are the OUTPUTs of the vertex shader and the INPUTs of the fragment shader.
+
+the vertex shader runs for a single vertex and the `attributes` contain the values for 
+that vertex. the vertex shader is responsible for outputting the corresponding `varying`
+ values for its vertex. those varying values are then interpolated over the surface of
+  the triangle and the resulting interpolated values are passed to the fragment 
+  shader in varyings of the same name.
+*/
+
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
 

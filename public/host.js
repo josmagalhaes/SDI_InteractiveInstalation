@@ -90,9 +90,9 @@ function draw()
     }
 
     // NOTE: game.draw() will get the input data processed to pass to shaders
-    //shader(shader_base);
+    shader(shader_base);
     // rect gives us some geometry on the screen
-    //rect(0, 0, width, height);
+    rect(0, 0, width, height);
 
     if (isHostConnected(/* display = true */))
     {
@@ -100,6 +100,11 @@ function draw()
         game.printPlayerIds(-half_width + 5, -half_height + 20);
     }
 
+    // TODO: this is a problem, the rect overlays on top of everything
+    //       to the text would either be rendered in the bottom, its own div/separator
+    //       the ideal, or in GLSL (not ideal).
+    //       The player IDs, etc.. would need to be rendered in GLSL however.
+    //
     // display address and QR code
     displayCustomAddress(color(0, 20, 80, 180), 12, 10 - half_width, half_height - 14);
     tagDiv.html(qr_img);
