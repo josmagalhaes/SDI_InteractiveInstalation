@@ -1,60 +1,24 @@
 "use strict";
 
+// TODO
+// just move sketch related essentials to static data in a
+// globals class.
+
 // essential UI parameters
-const screen_width  = 512;
-const screen_height = 512;
-const half_width    = screen_width / 2;
-const half_height   = screen_height / 2;
+var screen_width = 0;
+var screen_height = 0;
 const frame_rate    = 25;
 // enable to debug
 const debug = true;
 
 // network tests
-const serverIp   = "192.168.0.3"; //  10.0.0.23
-const serverPort = "3000";
-const local      = true;
+const serverIp   = "192.168.1.140";
+const serverPort  = "3000";
+const local = true;
 
 // player aux functions
 let player_color, player_color_dim;
 let player_colors;
-
-// motion
-let device_motion_value = 0;
-let rotx = 0, roty = 0, rotz = 0;
-let accx = 0, accy = 0, accz = 0;
-
-let motion = false;
-let ios    = false;
-
-// below code is essential for ios13 and above.
-// A click is needed for the device to request permission
-if (typeof DeviceMotionEvent.requestPermission === "function")
-{
-    document.body.addEventListener("click", () =>
-    {
-        DeviceMotionEvent.requestPermission()
-            .then(() =>
-            {
-                console.log("DeviceMotionEvent enabled");
-                motion = true;
-                ios = true;
-            })
-            .catch((error) =>
-            {
-                console.warn("DeviceMotionEvent not enabled", error);
-            });
-    })
-}
-else
-{
-    // we are not on ios13 and above
-    // todo
-    // add detection for hardware for other devices
-    // if(got the hardware) {
-    // motion = true;
-    // }
-    motion = true;
-}
 
 function set_player_colors()
 {
@@ -75,14 +39,16 @@ function setup()
 {
     if (debug)
     {
-        console.log("Initializing...");
         setuplogger();
+        console.log('Initializing...');
     }
-    // windowWidth, windowHeight, works with resized window
-    // USE: deviceOrientation for: "portrait" | "landscape"
-    let canvas = createCanvas(screen_width, screen_height, WEBGL);
+
+    // noCanvas();
+    let canvas = createCanvas(windowWidth, windowHeight);
+    screen_width = windowWidth;
+    screen_height = windowHeight;
     canvas.position(0, 0);
-    background(0);
+    background(255, 0, 0);
     frameRate(frame_rate);
     angleMode(RADIANS);
 
@@ -99,125 +65,59 @@ function setup()
 
         Use `type` to classify message types for host.
     */
-    sendData("player_color",
-    {
+    sendData("player_color", {
         r : red(player_colors["active_color"]) / 255,
         g : green(player_colors["active_color"]) / 255,
         b : blue(player_colors["active_color"]) / 255
     });
-
-    // sensors, input configuration
-    // shake threshold, default 30, above which, acceleration triggers
-    // deviceShake() call
-    setShakeThreshold(30);
-    // same for motion threshold
-    setMoveThreshold(0.5); // default is 0.5
 }
 
 function draw()
 {
     background(player_colors["dimmed_color"], 50);
 
+    //if (isClientConnected(display = true))
     if (isClientConnected())
     {
-        fill(255);
-        textAlign(CENTER, CENTER);
-
-        // smooth transition from [0,180] degrees and back.
-        // NOTE: rotationX,Y,Z are in degrees, but we set angle mode to
-        //       radians, so convert the input
-
-        let device_motion =
-        {
-            "z_motion" :
-                Math.round(width / 5 * Math.abs(radians(rotationZ) - PI)),
-            "y_motion" : Math.round(half_height + rotationX * 10),
-            "x_motion" : Math.round(half_width + rotationY * 10),
-            "x_rotation" : Math.round(rotationX),
-            "y_rotation" : Math.round(rotationY),
-            "z_rotation" : Math.round(rotationZ),
-            "x_accel" : accelerationX,
-            "y_accel" : accelerationY,
-            "z_accel" : accelerationZ,
-        };
-        sendData("device_moved", device_motion);
-
-        //
-        // motion affected circle
-        circle(
-            device_motion.x_motion,
-            device_motion.y_motion,
-            device_motion.z_motion);
-
-        // reference circle
-        stroke(255);
-        strokeWeight(3);
-        noFill();
-        circle(half_width, half_height, screen_width / 1.2);
-
-        // text to provide instructions and
-        // document values at the top of the screen
-        noStroke();
-        textSize(width / 35);
-
-        fill(255, 100, 50);
-        text("click to start on iOS", 10, 80);
-        text("on a mobile: twist, and tilt your device", 10, 120);
-        text(
-            "device - x: " + round(rotationX) + ", y: " + round(rotationX)
-                + ", z: " + round(rotationZ),
-            10,
-            160);
-
-        text(
-            "circle - x: " + xMotion + ", y: " + yMotion
-                + ", radius: " + zMotion,
-            10,
-            200);
+        ;
+    }
+    else
+    {
+        text("Not connected", screen_width / 2, screen_height / 2);
     }
 }
 
+// Messages can be sent from a host to all connected clients
 function onReceiveData(data)
 {
     // Input data processing here. --->
-
     if (data.type === "timestamp")
     {
         print(data.timestamp);
     }
+
+    // <----
+    /* Example:
+       if (data.type === "myDataType") {
+         processMyData(data);
+       }
+
+       Use "data.type" to get the message type sent by host.
+    */
 }
 
-// called every time the user touches screen or clicks
-function touchMoved()
+function mouseClicked(event)
 {
     if (debug)
     {
-        console.log(`Touched at X = ${mouseX}, Y = ${mouseY}`);
+        console.log(`sketch X = ${mouseX}, Y = ${mouseY}`);
     }
-}
 
-// default threshold of 0.5 for device motion on X,Y,Z
-function deviceMoved()
-{
-    device_motion_value = constrain(device_motion_value + 5, 0, 255);
-}
-
-function deviceShake()
-{
-    // setShakeThreshold(30); // default, override in setup()
-    sendData("shaken", {"shaken" : true});
-}
-
-function touchMoved()
-{
-    let coords = {
-        "x_coord" : mouseX,
-        "y_coord" : mouseY,
-        // previous coords
-        "x_pcoord" : pmouseX,
-        "y_pcoord" : pmouseY
+    const input_coords = {
+        "xcoord" : mouseX,
+        "ycoord" : mouseY,
     };
-    sendData("touch_drag", coords);
+    sendData("input_coords", input_coords);
 }
 
 function windowResized()
@@ -225,35 +125,14 @@ function windowResized()
     resizeCanvas(windowWidth, windowHeight);
 }
 
-window.addEventListener("deviceorientation", function(ev) {
-    if (debug)
-    {
-        console.info(ev.alpha, ev.beta, ev.gamma);
-        console.log(
-            `alpha = ${ev.alpha}, beta = ${ev.beta}, gamma = ${ev.gamma}`);
-    }
-})
-
-window.addEventListener("devicemotion", (ev) =>
+function mouseMoved(event)
 {
-    if (debug)
-    {
-        console.info(ev.acceleration.y, ev.rotationRate.gamma);
-        console.log(`accel Y = ${ev.acceleration.y}, rotation gamma = ${ev.rotationRate.gamma}`);
-        console.log(`accel X = ${ev.acceleration.y}, rotation gamma = ${ev.rotationRate.gamma}`);
-        console.log(`accel Z = ${ev.acceleration.y}, rotation gamma = ${ev.rotationRate.gamma}`);
-    }
-})
+    ;
+}
 
-// accelerometer Data
-window.addEventListener("devicemotion", (e) =>
+/// Add these lines below sketch to prevent scrolling on mobile
+function touchMoved()
 {
-    // get accelerometer values
-    x = parseInt(e.accelerationIncludingGravity.x);
-    y = parseInt(e.accelerationIncludingGravity.y);
-    z = parseInt(e.accelerationIncludingGravity.z);
-    if (debug)
-    {
-        console.log("X accel = " + x + ", Y = " + y + ", Z = " + z);
-    }
-});
+    // do some stuff
+    return false;
+}
