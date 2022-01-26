@@ -62,10 +62,8 @@ function setup()
     {
         setuplogger();
         console.log('Initializing...');
-
     }
     
-
     // noCanvas();
     //canvas = createCanvas(windowWidth, windowHeight);
     //canvas.position(0, 0);
@@ -114,8 +112,6 @@ function draw()
     {
         tagDiv.html(qr_img);
     }
-    
-    
 }
 
 function onClientConnect(data)
@@ -217,9 +213,7 @@ function processMouseClick(data)
             0.0, 1.0);
 
         log(`processMouseClick: Frequency = ${frequency}, amplitude = ${amplitude}`);
-
         game.updateSoundWaves(data.id, frequency, amplitude, "sine");
-
 
         //game.updateVisuals(data.id);
         if (debug)
@@ -273,7 +267,6 @@ function processEmotions(data)
 }
 
 
-
 // Displays server address in lower left of screen
 function room_url(roomid = null)
 {
@@ -298,7 +291,6 @@ function mousePressed()
 {
     userStartAudio();
 }
-
 
 function windowResized()
 {
