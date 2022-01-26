@@ -15,32 +15,32 @@ resizeCanvas();
 
 let config =
     {
-      SIM_RESOLUTION : 128, // 256 is ok
+      SIM_RESOLUTION : 512, // 256 is ok
       DYE_RESOLUTION : 1024,
       CAPTURE_RESOLUTION : 512,
-      DENSITY_DISSIPATION : 1,    // 2 faster
-      VELOCITY_DISSIPATION : 0.2, // 0.05
-      PRESSURE : 0.8,             // pressure 0.98 works like fluid, denser
-      PRESSURE_ITERATIONS : 20,
-      CURL : 30, // 200 more floral, with higher pressure
+      DENSITY_DISSIPATION : 0.7,    // 2 faster
+      VELOCITY_DISSIPATION : 0.5, // 0.05
+      PRESSURE : 0.99,             // pressure 0.98 works like fluid, denser
+      PRESSURE_ITERATIONS : 30,
+      CURL : 70, // 200 more floral, with higher pressure
       SPLAT_RADIUS : 0.25,
-      SPLAT_FORCE : 6000,
+      SPLAT_FORCE : 2500,
       SHADING : true,
-      COLORFUL : true,
-      COLOR_UPDATE_SPEED : 10,
+      COLORFUL : false,
+      COLOR_UPDATE_SPEED : 0.1,
       PAUSED : false,
       BACK_COLOR : {r : 0, g : 0, b : 0},
       // BACK_COLOR: { r: 120, g: 180, b: 240 },
       TRANSPARENT : false,
-      BLOOM : false,
+      BLOOM : true,
       BLOOM_ITERATIONS : 8,
-      BLOOM_RESOLUTION : 256,
-      BLOOM_INTENSITY : 0.8,
-      BLOOM_THRESHOLD : 0.6,
-      BLOOM_SOFT_KNEE : 0.7,
-      SUNRAYS : true,
-      SUNRAYS_RESOLUTION : 196,
-      SUNRAYS_WEIGHT : 1.0,
+      BLOOM_RESOLUTION : 512,
+      BLOOM_INTENSITY : 0.2,
+      BLOOM_THRESHOLD : 0.8,
+      BLOOM_SOFT_KNEE : 0.3,
+      SUNRAYS : false,
+      SUNRAYS_RESOLUTION : 512,
+      SUNRAYS_WEIGHT : 0.5,
     }
 
 function
@@ -73,8 +73,6 @@ if (!ext.supportLinearFiltering) {
   config.BLOOM = false;
   config.SUNRAYS = false;
 }
-
-// startGUI();
 
 function getWebGLContext(canvas) {
   const params = {
@@ -165,111 +163,6 @@ function supportRenderTextureFormat(gl, internalFormat, format, type) {
 
   let status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
   return status == gl.FRAMEBUFFER_COMPLETE;
-}
-
-function startGUI() {
-  var gui = new dat.GUI({width : 300});
-  gui.add(config, 'DYE_RESOLUTION',
-          {'high' : 1024, 'medium' : 512, 'low' : 256, 'very low' : 128})
-      .name('quality')
-      .onFinishChange(initFramebuffers);
-  gui.add(config, 'SIM_RESOLUTION',
-          {'32' : 32, '64' : 64, '128' : 128, '256' : 256})
-      .name('sim resolution')
-      .onFinishChange(initFramebuffers);
-  gui.add(config, 'DENSITY_DISSIPATION', 0, 4.0).name('density diffusion');
-  gui.add(config, 'VELOCITY_DISSIPATION', 0, 4.0).name('velocity diffusion');
-  gui.add(config, 'PRESSURE', 0.0, 1.0).name('pressure');
-  gui.add(config, 'CURL', 0, 50).name('vorticity').step(1);
-  gui.add(config, 'SPLAT_RADIUS', 0.01, 1.0).name('splat radius');
-  gui.add(config, 'SHADING').name('shading').onFinishChange(updateKeywords);
-  gui.add(config, 'COLORFUL').name('colorful');
-  gui.add(config, 'PAUSED').name('paused').listen();
-
-  gui.add({fun : () => { splatStack.push(parseInt(Math.random() * 20) + 5); }},
-          'fun')
-      .name('Random splats');
-
-  let bloomFolder = gui.addFolder('Bloom');
-  bloomFolder.add(config, 'BLOOM')
-      .name('enabled')
-      .onFinishChange(updateKeywords);
-
-  bloomFolder.add(config, 'BLOOM_INTENSITY', 0.1, 2.0).name('intensity');
-  bloomFolder.add(config, 'BLOOM_THRESHOLD', 0.0, 1.0).name('threshold');
-
-  let sunraysFolder = gui.addFolder('Sunrays');
-  sunraysFolder.add(config, 'SUNRAYS')
-      .name('enabled')
-      .onFinishChange(updateKeywords);
-  sunraysFolder.add(config, 'SUNRAYS_WEIGHT', 0.3, 1.0).name('weight');
-
-  let captureFolder = gui.addFolder('Capture');
-  captureFolder.addColor(config, 'BACK_COLOR').name('background color');
-  captureFolder.add(config, 'TRANSPARENT').name('transparent');
-  captureFolder.add({fun : captureScreenshot}, 'fun').name('take screenshot');
-
-  let github =
-      gui.add({
-           fun : () => {
-             window.open(
-                 'https://github.com/PavelDoGreat/WebGL-Fluid-Simulation');
-             ga('send', 'event', 'link button', 'github');
-           }
-         },
-              'fun')
-          .name('Github');
-          
-  github.__li.className = 'cr function bigFont';
-  github.__li.style.borderLeft = '3px solid #8C8C8C';
-  let githubIcon = document.createElement('span');
-  github.domElement.parentElement.appendChild(githubIcon);
-  githubIcon.className = 'icon github';
-
-  let twitter = gui.add({
-                     fun : () => {
-                       ga('send', 'event', 'link button', 'twitter');
-                       window.open('https://twitter.com/PavelDoGreat');
-                     }
-                   },
-                        'fun')
-                    .name('Twitter');
-  twitter.__li.className = 'cr function bigFont';
-  twitter.__li.style.borderLeft = '3px solid #8C8C8C';
-  let twitterIcon = document.createElement('span');
-  twitter.domElement.parentElement.appendChild(twitterIcon);
-  twitterIcon.className = 'icon twitter';
-
-  let discord = gui.add({
-                     fun : () => {
-                       ga('send', 'event', 'link button', 'discord');
-                       window.open('https://discordapp.com/invite/CeqZDDE');
-                     }
-                   },
-                        'fun')
-                    .name('Discord');
-  discord.__li.className = 'cr function bigFont';
-  discord.__li.style.borderLeft = '3px solid #8C8C8C';
-  let discordIcon = document.createElement('span');
-  discord.domElement.parentElement.appendChild(discordIcon);
-  discordIcon.className = 'icon discord';
-
-  let app = gui.add({
-                 fun : () => {
-                   ga('send', 'event', 'link button', 'app');
-                   window.open('http://onelink.to/5b58bn');
-                 }
-               },
-                    'fun')
-                .name('Check out mobile app');
-  app.__li.className = 'cr function appBigFont';
-  app.__li.style.borderLeft = '3px solid #00FF7F';
-  let appIcon = document.createElement('span');
-  app.domElement.parentElement.appendChild(appIcon);
-  appIcon.className = 'icon app';
-
-  if (isMobile())
-    gui.close();
 }
 
 function isMobile() { return /Mobi|Android/i.test(navigator.userAgent); }
@@ -527,7 +420,7 @@ const checkerboardShader = compileShader(gl.FRAGMENT_SHADER, `
     uniform sampler2D uTexture;
     uniform float aspectRatio;
 
-    #define SCALE 25.0
+    #define SCALE 50.0
 
     void main () {
         vec2 uv = floor(vUv * SCALE * vec2(aspectRatio, 1.0));
@@ -558,6 +451,52 @@ const displayShaderSource = `
         return max(1.055 * pow(color, vec3(0.416666667)) - 0.055, vec3(0));
     }
 
+    vec3 tonemap_aces(vec3 color, float white)
+    {
+      const float exposure_bias = 1.8;
+      const float A = 0.0245786;
+      const float B = 0.000090537;
+      const float C = 0.983729;
+      const float D = 0.432951;
+      const float E = 0.238081;
+    
+      const mat3 rgb_to_rrt = mat3(
+          vec3(0.59719 * exposure_bias, 0.35458 * exposure_bias, 0.04823 * exposure_bias),
+          vec3(0.07600 * exposure_bias, 0.90834 * exposure_bias, 0.01566 * exposure_bias),
+          vec3(0.02840 * exposure_bias, 0.13383 * exposure_bias, 0.83777 * exposure_bias));
+    
+      const mat3 odt_to_rgb = mat3(
+          vec3(1.60475, -0.53108, -0.07367),
+          vec3(-0.10208, 1.10813, -0.00605),
+          vec3(-0.00327, -0.07276, 1.07602));
+    
+      color *= rgb_to_rrt;
+      vec3 color_tonemapped = (color * (color + A) - B) / (color * (C * color + D) + E);
+      color_tonemapped *= odt_to_rgb;
+    
+      white *= exposure_bias;
+      float white_tonemapped = (white * (white + A) - B) / (white * (C * white + D) + E);
+    
+      return color_tonemapped / white_tonemapped;
+    }
+    // Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
+    float aces(float x) {
+      const float a = 2.51;
+      const float b = 0.03;
+      const float c = 2.43;
+      const float d = 0.59;
+      const float e = 0.14;
+      return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+    }
+  
+    vec3 aces(vec3 x) {
+      const float a = 2.51;
+      const float b = 0.03;
+      const float c = 2.43;
+      const float d = 0.59;
+      const float e = 0.14;
+      return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+    }
     void main () {
         vec3 c = texture2D(uTexture, vUv).rgb;
 
@@ -573,7 +512,9 @@ const displayShaderSource = `
         vec3 n = normalize(vec3(dx, dy, length(texelSize)));
         vec3 l = vec3(0.0, 0.0, 1.0);
 
-        float diffuse = clamp(dot(n, l) + 0.7, 0.7, 1.0);
+        //float diffuse = clamp(dot(n, l) + 0.7, 0.7, 1.0);
+        float ndotl = max(0.0, dot(n, l));
+        float diffuse = ndotl * ndotl;
         c *= diffuse;
     #endif
 
@@ -596,9 +537,9 @@ const displayShaderSource = `
         bloom = linearToGamma(bloom);
         c += bloom;
     #endif
-
-        float a = max(c.r, max(c.g, c.b));
-        gl_FragColor = vec4(c, a);
+    float a = max(c.r, max(c.g, c.b));
+    a = 1.0;
+    gl_FragColor = vec4(tonemap_aces(c, 10.0), a);
     }
 `;
 
@@ -731,7 +672,7 @@ const splatShader = compileShader(gl.FRAGMENT_SHADER, `
     void main () {
         vec2 p = vUv - point.xy;
         p.x *= aspectRatio;
-        vec3 splat = exp(-dot(p, p) / radius) * color;
+        vec3 splat = exp(-dot(p, p) * 3.0 / radius) * color;
         vec3 base = texture2D(uTarget, vUv).xyz;
         gl_FragColor = vec4(base + splat, 1.0);
     }
@@ -1661,7 +1602,7 @@ function correctDeltaY(delta) {
 // random color generation from HSB to RGB
 // the rest are utilities for color normalization etc
 function generateColor() {
-  let c = HSVtoRGB(Math.random(), 1.0, 1.0);
+  let c = HSVtoRGB(Math.random() * 60 + 180 / 360.0, 1.0, 1.0);
   c.r *= 0.15;
   c.g *= 0.15;
   c.b *= 0.15;
