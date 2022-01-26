@@ -8,11 +8,12 @@
 var screen_width = 0;
 var screen_height = 0;
 const frame_rate    = 25;
+
 // enable to debug
 const debug = true;
 
 // network tests
-const serverIp   = "192.168.1.140";
+const serverIp   = "192.168.0.3";
 const serverPort  = "3000";
 const local = true;
 
@@ -27,6 +28,7 @@ function set_player_colors()
     player_color     = color(hue, 100, 100);
     player_color_dim = color(hue, 100, 80);
     colorMode(RGB);
+
     return {"active_color" : player_color, "dimmed_color" : player_color_dim};
 }
 
