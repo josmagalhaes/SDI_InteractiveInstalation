@@ -13,7 +13,7 @@ const frame_rate    = 25;
 const debug = true;
 
 // network tests
-const serverIp   = "192.168.1.140";
+const serverIp   = "192.168.0.3";
 const serverPort  = "3000";
 const local = true;
 
@@ -68,15 +68,15 @@ function setup()
         Use `type` to classify message types for host.
     */
     sendData("player_color", {
-        r : red(player_colors["active_color"]) / 255,
-        g : green(player_colors["active_color"]) / 255,
-        b : blue(player_colors["active_color"]) / 255
+        r : red(player_colors.active_color) / 255,
+        g : green(player_colors.active_color) / 255,
+        b : blue(player_colors.active_color) / 255
     });
 }
 
 function draw()
 {
-    background(player_colors["dimmed_color"], 50);
+    background(player_colors.dimmed_color, 50);
 
     //if (isClientConnected(display = true))
     if (isClientConnected())
@@ -114,11 +114,11 @@ function mouseClicked(event)
     {
         console.log(`sketch X = ${mouseX}, Y = ${mouseY}`);
     }
-    console.log(player_color);
+
     const input_coords = {
         "xcoord" : mouseX/windowWidth,
         "ycoord" : 1 - (mouseY/windowHeight),
-        "playercolor" : player_color["maxes"]["rgb"],
+        "playercolor" : player_colors.active_color._array,
     };
     sendData("input_coords", input_coords);
 }

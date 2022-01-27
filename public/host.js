@@ -16,7 +16,7 @@ Run http-server -c-1 -p80 to start server on open port 80.
 // const serverIp      = 'https://yourservername.herokuapp.com';
 // const serverIp      = 'https://yourprojectname.glitch.me';
 
-const serverIp = "192.168.1.140";
+const serverIp = "192.168.0.3";
 const serverPort = "3000";
 const local = true;
 let game;
