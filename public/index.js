@@ -18,7 +18,7 @@ const serverPort  = "3000";
 const local = true;
 
 // player aux functions
-let player_color, player_color_dim;
+let player_color, player_color_dim, background_rgb;
 let player_colors;
 
 function set_player_colors()
@@ -27,6 +27,7 @@ function set_player_colors()
     // ndx from state ramp, and state (palette)
     player_color = Palette.get_rgba_color(ndx, 0);
     player_color_dim = player_color * 0.75;
+
     return {"active_color" : player_color, "dimmed_color" : player_color_dim};
 }
 
@@ -50,7 +51,11 @@ function setup()
     canvas.position(0, 0);
     // setup player colors and other client variables
     player_colors = set_player_colors()
-    background(player_colors.active_color);
+    background_rgb = color(
+        player_colors.active_color[0] * 255,
+        player_colors.active_color[1] * 255,
+        player_colors.active_color[2] * 255);
+    background(background_rgb);
     frameRate(frame_rate);
     angleMode(RADIANS);
 
@@ -76,7 +81,8 @@ function setup()
 
 function draw()
 {
-    background(player_colors.active_color);
+    console.log("BG = " + background_rgb);
+    background(background_rgb);
 
     //if (isClientConnected(display = true))
     if (isClientConnected())
