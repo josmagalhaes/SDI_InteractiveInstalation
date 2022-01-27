@@ -23,12 +23,10 @@ let player_colors;
 
 function set_player_colors()
 {
-    let hue = random(0, 360);
-    colorMode(HSB);
-    player_color     = color(hue, 100, 100);
-    player_color_dim = color(hue, 100, 80);
-    colorMode(RGB);
-
+    const ndx = Math.floor(Math.random() * 20);
+    // ndx from state ramp, and state (palette)
+    player_color = Palette.get_rgba_color(ndx, 0);
+    player_color_dim = player_color * 0.75;
     return {"active_color" : player_color, "dimmed_color" : player_color_dim};
 }
 
@@ -50,12 +48,13 @@ function setup()
     screen_width = windowWidth;
     screen_height = windowHeight;
     canvas.position(0, 0);
-    background(255, 0, 0);
+    // setup player colors and other client variables
+    player_colors = set_player_colors()
+    background(player_colors.active_color);
     frameRate(frame_rate);
     angleMode(RADIANS);
 
-    // setup player colors and other client variables
-    player_colors = set_player_colors();
+
     // Send any initial setup data to your host here.
     /*
         Example:
@@ -68,20 +67,21 @@ function setup()
         Use `type` to classify message types for host.
     */
     sendData("player_color", {
-        r : red(player_colors.active_color) / 255,
-        g : green(player_colors.active_color) / 255,
-        b : blue(player_colors.active_color) / 255
+        r : red(player_colors.active_color),
+        g : green(player_colors.active_color),
+        b : blue(player_colors.active_color),
+        a : alpha(player_colors.active_color),
     });
 }
 
 function draw()
 {
-    background(player_colors.dimmed_color, 50);
+    background(player_colors.active_color);
 
     //if (isClientConnected(display = true))
     if (isClientConnected())
     {
-        
+        text("Connected!");
     }
     else
     {
@@ -118,7 +118,7 @@ function mouseClicked(event)
     const input_coords = {
         "xcoord" : mouseX/windowWidth,
         "ycoord" : 1 - (mouseY/windowHeight),
-        "playercolor" : player_colors.active_color._array,
+        "playercolor" : player_colors.active_color,
     };
     sendData("input_coords", input_coords);
 }
