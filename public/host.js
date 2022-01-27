@@ -168,7 +168,8 @@ function onReceiveData(data)
 {
     if (data == null || data === "undefined") return;
 
-    if (debug) {
+    if (debug)
+    {
         console.log(`data keys = ${Object.keys(data)}`);
     }
 
@@ -185,72 +186,113 @@ function onReceiveData(data)
         const dy = 1000 * (Math.random() - 0.5);
         splat(x, y, dx, dy , color);
 
-    } else if (data.type === "input_coords")
+    }
+    else if (data.type === "input_coords")
     {
         processMouseClick(data);
         // game method to process input coords (sound effect)
     }
-
-    /* Example:
-    if (data.type === 'myDataType') {
-        processMyData(data);
+    // If the device motion is above a shake threshold, trigger
+    else if (data.type === "shaken")
+    {
+        processDeviceShake(data);
     }
-    Use `data.type` to get the message type sent by client.
-    */
+    // If device motion is above a shake threshold, trigger, so that we
+    // have a binary state: resting | movement
+    else if (data.type === "device_moved")
+    {
+        // accelerationX|Y|Z, rotationX|Y|Z
+        // inclination
+        processDeviceSensors(data);
+    }
+    // Touch & drag, not yet active
+    else if (data.type === "touch_drag")
+    {
+        processTouchDrag(data);
+    }
 
 }
 
-// This is included for testing purposes to demonstrate that
-// messages can be sent from a host back to all connected clients
-function mousePressed() {
-    sendData("timestamp", {
-        timestamp: millis()
-    });
-}
-
-////////////
+//
 // Input processing
 // function that calls method of globally accessible game object which
 // was declared outside any method, globally, but instantiated within setup()
 //
 
-function processMouseClick(data) {
-    if (data != null) {
-        game.players[data.id].xcoord = data.xcoord;
-        game.players[data.id].ycoord = data.ycoord;
+function processMouseClick(data)
+{
+    if (data == null || data === "undefined") return;
 
-        let color = {};
-        color.r = data.playercolor[0];
-        color.g = data.playercolor[1];
-        color.b = data.playercolor[2];
-        const x = data.xcoord;
-        const y = data.ycoord;
-        const dx = 1000 * (Math.random() - 0.5);
-        const dy = 1000 * (Math.random() - 0.5);
-        splat(x, y, dx, dy , color);
-        
-       const frequency = MathUtils.clamp(Math.round(
-                map(data.xcoord, 0, this.windowWidth,
-                    game.players[data.id].frequency_range.min_frequency,
-                    game.players[data.id].frequency_range.max_frequency)),
-            absolute_min_frequency, absolute_max_frequency);
+    game.players[data.id].xcoord = data.xcoord;
+    game.players[data.id].ycoord = data.ycoord;
 
-        const amplitude = MathUtils.clamp(
-            map(data.ycoord, 0, this.windowHeight, 0.001, 1.0),
-            0.0, 1.0);
+    let color = {};
+    color.r = data.playercolor[0];
+    color.g = data.playercolor[1];
+    color.b = data.playercolor[2];
+    const x = data.xcoord;
+    const y = data.ycoord;
+    const dx = 1000 * (Math.random() - 0.5);
+    const dy = 1000 * (Math.random() - 0.5);
+    splat(x, y, dx, dy , color);
+    
+    const frequency = MathUtils.clamp(Math.round(
+            map(data.xcoord, 0, this.windowWidth,
+                game.players[data.id].frequency_range.min_frequency,
+                game.players[data.id].frequency_range.max_frequency)),
+        absolute_min_frequency, absolute_max_frequency);
 
-        if (debug)
+    const amplitude = MathUtils.clamp(
+        map(data.ycoord, 0, this.windowHeight, 0.001, 1.0),
+        0.0, 1.0);
+
+    if (debug)
+    {
+        log(`processMouseClick: Frequency = ${frequency}, amplitude = ${amplitude}`);
+    }
+    game.updateSoundWaves(data.id, frequency, amplitude, "sine");
+
+    //game.updateVisuals(data.id);
+    if (debug)
+    {
+        console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
+    }
+}
+
+function processTouchDrag(data)
+{
+    if (debug)
+    {
+        fill(255, 200, 0);
+        text("Process touch & drag:");
+        if (data != null)
         {
-            log(`processMouseClick: Frequency = ${frequency}, amplitude = ${amplitude}`);
-        }
-        game.updateSoundWaves(data.id, frequency, amplitude, "sine");
-
-        //game.updateVisuals(data.id);
-        if (debug)
-        {
-            console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
+            // text(`Process touch & drag: x coord = ${data.x_coord}, movedX =
+            // ${data.x_motion}`); text(`Process touch & drag: y coord =
+            // ${data.y_coord}, movedX = ${data.y_motion}`);
         }
     }
+}
+
+//
+// Input processing
+// TODO: move to own separate class, this is annoying
+function processJoystick(data)
+{
+    fill(0, 255, 0);
+    text("process joystick data", width / 2, height / 2);
+}
+
+function processDeviceShake(data)
+{
+    fill(255, 200, 0);
+    text("process device shake");
+}
+
+function processDeviceSensors(data)
+{
+    fill(255, 200, 0);
+    text("process device sensors");
 }
 
 /*
@@ -280,51 +322,6 @@ function move() {
 }
 */
 
-// Starting to move
-
-
-// process input shake? change wave type
-function processEmotions(data) {
-    if (data != null) {
-        /*
-        game.players[data.id].emotion = data.emotion;
-        game.players[data.id].confidence = data.confidence;
-
-        // emotions are: angry | sad | surprised | happy
-        if (data.emotion === "angry")
-        {
-            game.players[data.id].wavetype = "square";
-        }
-        else if (data.emotion === "sad")
-        {
-            game.players[data.id].wavetype = "triangle";
-        }
-        else if (data.emotion === "surprised")
-        {
-            game.players[data.id].wavetype = "sawtooth";
-        }
-        else if (data.emotion === "happy")
-        {
-            game.players[data.id].wavetype = "sine";
-        }
-        //game.players[data.id].amplitude = data.confidence;
-        //game.updateWaveType(
-        //    data.id,
-        //   game.players[data.id].wavetype,
-        //    game.players[data.id].confidence);
-
-        //game.updateCymatics(data.id);
-
-        if (debug)
-        {
-            console.log(`${data.id} emotion = ${data.emotion},
-            confidence = ${data.confidence}`);
-        }
-        */
-    }
-}
-
-
 // Displays server address in lower left of screen
 function room_url(roomid = null) {
     if (roomid != null)
@@ -343,7 +340,14 @@ function generate_qrcode(qr_input_string, margin, size) {
     return qr_img;
 }
 
-function mousePressed() {
+
+// This is included for testing purposes to demonstrate that
+// messages can be sent from a host back to all connected clients
+function mousePressed()
+{
+    sendData("timestamp", {
+        timestamp: millis()
+    });
     userStartAudio();
 }
 
