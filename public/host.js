@@ -104,13 +104,8 @@ function draw() {
     // game.draw();
   }
 
-  displayCustomAddress(color(255, 180), 12, 10, screen_height - 14);
-
-  if (debug) {
-    document.getElementById("qrcode").innerHTML = qr_img;
-  } else {
-    tagDiv.html(qr_img);
-  }
+  displayCustomAddress(color(255, 180), 12, 10, screen_height - 14)
+  document.getElementById("qrcode").innerHTML = qr_img;
 }
 
 function onClientConnect(data) {
