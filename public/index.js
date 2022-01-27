@@ -6,8 +6,8 @@
 
 // essential UI parameters
 // display dimensions scale to mobile
-var screen_width = 512;
-var screen_height = 512;
+var screen_width = 0;
+var screen_height = 0;
 //
 var half_width = screen_width / 2;
 var half_height = screen_height / 2;
@@ -82,6 +82,9 @@ function setup() {
   let canvas = createCanvas(windowWidth, windowHeight);
   screen_width = windowWidth;
   screen_height = windowHeight;
+  half_width = screen_width / 2;
+  half_height = screen_height / 2;
+
   canvas.position(0, 0);
   // setup player colors and other client variables
   player_colors = set_player_colors()
@@ -205,12 +208,14 @@ function touchMoved() {
   return false;
 }
 */
-/*
-function deviceShake() {
+
+function deviceShake()
+{
   // setShakeThreshold(30); // default, override in setup()
   sendData("shaken", {"shaken" : true});
 }
 
+/*
 // default threshold of 0.5 for device motion on X,Y,Z
 function deviceMoved() {
   device_motion_value = constrain(device_motion_value + 5, 0, 255);
@@ -259,15 +264,18 @@ function mouseClicked(event) {
   }
 
   const input_coords = {
-    "xcoord" : mouseX / windowWidth,
-    "ycoord" : 1 - (mouseY / windowHeight),
+    "xcoord" : mouseX / windowWidth / 2,
+    "ycoord" : 1 - (mouseY / windowHeight / 2),
     "playercolor" : player_colors.active_color,
   };
   sendData("input_coords", input_coords);
 }
 
-function windowResized() { resizeCanvas(windowWidth, windowHeight); }
-
+/* full screening will change the size of the canvas */
+function windowResized()
+{
+  resizeCanvas(windowWidth, windowHeight);
+}
 window.addEventListener("deviceorientation", function(ev) {
   if (debug) {
     console.info(ev.alpha, ev.beta, ev.gamma);
@@ -296,10 +304,19 @@ window.addEventListener("devicemotion", (e) => {
   if (debug) {
     console.log("X accel = " + x + ", Y = " + y + ", Z = " + z);
   }
-});
+})
 
 function mousePressed() { userStartAudio(); }
 
-function mouseMoved(event) {
+function mouseMoved(event)
+{
   ; // userStartAudio() ?
 }
+
+/* prevents the mobile browser from processing some default
+ * touch events, like swiping left for "back" or scrolling
+ * the page.
+ */
+document.ontouchmove = function(event) {
+  event.preventDefault();
+};
