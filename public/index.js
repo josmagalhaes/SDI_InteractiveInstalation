@@ -5,8 +5,13 @@
 // globals class.
 
 // essential UI parameters
-var screen_width = 0;
-var screen_height = 0;
+// display dimensions scale to mobile
+var screen_width = displayWidth;
+var screen_height = displayHeight;
+//
+var half_width = screen_width / 2;
+var half_height = screen_height / 2;
+
 const frame_rate = 25;
 
 // enable to debug
@@ -108,7 +113,8 @@ function draw() {
   background(background_rgb);
 
   // if (isClientConnected(display = true))
-  if (isClientConnected()) {
+  if (true) // isClientConnected() || connected)
+  {
     fill(255);
     textAlign(CENTER, CENTER);
     text("Connected!");
@@ -172,6 +178,7 @@ function onReceiveData(data) {
 }
 
 // called every time the user touches screen or clicks
+/*
 function touchMoved() {
   if (debug) {
     console.log(`Touched at X = ${mouseX}, Y = ${mouseY}`);
@@ -192,6 +199,7 @@ function touchMoved() {
   // return false to prevent scrolling on mobile ?
   return false;
 }
+*/
 
 function deviceShake() {
   // setShakeThreshold(30); // default, override in setup()
@@ -201,6 +209,37 @@ function deviceShake() {
 // default threshold of 0.5 for device motion on X,Y,Z
 function deviceMoved() {
   device_motion_value = constrain(device_motion_value + 5, 0, 255);
+}
+
+function touchStarted(event)
+{
+  if (debug) {
+    console.log(`sketch X = ${mouseX}, Y = ${mouseY}`);
+  }
+
+  // https://forum.processing.org/two/discussion/12767/index.html#Comment_111133
+  const input_coords = {
+    "xcoord" : coordX, // mouseX / windowWidth,
+    "ycoord" : coordY, // 1 - (mouseY / windowHeight),
+    "playercolor" : player_colors.active_color,
+  };
+  sendData("input_coords", input_coords);
+}
+
+function touchMoved(event)
+{
+  // defined in the script coordX, coordY
+  // https://forum.processing.org/two/discussion/12767/index.html#Comment_111133
+  if (debug) {
+    console.log(`sketch X = ${mouseX}, Y = ${mouseY}`);
+  }
+
+  const input_coords = {
+    "xcoord" : coordX, // mouseX / windowWidth,
+    "ycoord" : coordY, // 1 - (mouseY / windowHeight),
+    "playercolor" : player_colors.active_color,
+  };
+  sendData("input_coords", input_coords);
 }
 
 function mouseClicked(event) {
