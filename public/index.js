@@ -6,8 +6,8 @@
 
 // essential UI parameters
 // display dimensions scale to mobile
-var screen_width = displayWidth;
-var screen_height = displayHeight;
+var screen_width = 512;
+var screen_height = 512;
 //
 var half_width = screen_width / 2;
 var half_height = screen_height / 2;
@@ -15,7 +15,7 @@ var half_height = screen_height / 2;
 const frame_rate = 25;
 
 // enable to debug
-const debug = true;
+const debug = false;
 
 // network tests
 const serverIp = "192.168.0.3";
@@ -178,29 +178,34 @@ function onReceiveData(data) {
 }
 
 // called every time the user touches screen or clicks
+
 /*
 function touchMoved() {
+  text("TOUCH MODED X = " + mouseX + ", CX = " + coordX);
+
   if (debug) {
-    console.log(`Touched at X = ${mouseX}, Y = ${mouseY}`);
+    console.log(`Touched at X = ${mouseX}, Y = ${mouseY}, cX = ${coordX}, cY = ${coordY}`);
   }
   let coords = {
-    "x_coord" : mouseX,
-    "y_coord" : mouseY,
+    "xcoord" : mouseX,
+    "ycoord" : mouseY,
     // mouse movement since last frame
     //"x_motion" : movedX,
     //"y_motion" : movedY,
     // previous coords
-    "x_pcoord" : pmouseX,
-    "y_pcoord" : pmouseY,
+    // "xpcoord" : pmouseX,
+    // "ypcoord" : pmouseY,
+    "coordx" : coordX,
+    "coordy" : coordY, 
     "playercolor" : player_colors.active_color,
-  };
+  }
   sendData("touch_drag", coords);
 
   // return false to prevent scrolling on mobile ?
   return false;
 }
 */
-
+/*
 function deviceShake() {
   // setShakeThreshold(30); // default, override in setup()
   sendData("shaken", {"shaken" : true});
@@ -225,7 +230,9 @@ function touchStarted(event)
   };
   sendData("input_coords", input_coords);
 }
+*/
 
+/*
 function touchMoved(event)
 {
   // defined in the script coordX, coordY
@@ -241,8 +248,12 @@ function touchMoved(event)
   };
   sendData("input_coords", input_coords);
 }
+*/
+
 
 function mouseClicked(event) {
+  console.log("MOUSE CLICKED X = " + mouseX + ", CX = " + coordX);
+
   if (debug) {
     console.log(`sketch X = ${mouseX}, Y = ${mouseY}`);
   }

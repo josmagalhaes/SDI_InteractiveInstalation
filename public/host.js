@@ -30,7 +30,7 @@ const half_width = screen_width / 2;
 const half_height = screen_height / 2;
 
 // enable to debug
-const debug = true;
+const debug = false;
 p5.disableFriendlyErrors = true;
 
 // sound synthesis related
@@ -173,14 +173,14 @@ function onReceiveData(data) {
   }
   // If the device motion is above a shake threshold, trigger
   else if (data.type === "shaken") {
-    processDeviceShake(data);
+    //processDeviceShake(data);
   }
   // If device motion is above a shake threshold, trigger, so that we
   // have a binary state: resting | movement
   else if (data.type === "device_moved") {
     // accelerationX|Y|Z, rotationX|Y|Z
     // inclination
-    processDeviceSensors(data);
+    //processDeviceSensors(data);
   }
   // Touch & drag, not yet active
   else if (data.type === "touch_drag") {
