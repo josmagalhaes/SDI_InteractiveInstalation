@@ -32,7 +32,7 @@ const half_height = screen_height / 2;
 
 // enable to debug
 const debug = true;
-p5.disableFriendlyErrors = (debug == false) ? true : false;
+p5.disableFriendlyErrors = true;
 
 // sound synthesis related
 const absolute_min_frequency = 20;
@@ -46,26 +46,38 @@ const fft_samples = 64;
 
 // QR code related stuff
 let qr_img;
-
 // an HTML div to display it in:
 let tagDiv;
+// font related
+let font;
 
 
 function preload()
 {
     setupHost();
+    // fonts must be loaded and set before drawing text
+    // WebGL text()
+    // https://github.com/processing/p5.js/wiki/Getting-started-with-WebGL-in-p5
+    font = loadFont("assets/RobotoMono-Regular.ttf");
 }
 
 function setup()
 {
-    if (debug) {
+    if (debug)
+    {
+        p5.disableFriendlyErrors = false;
         setuplogger();
         console.log('Initializing...');
     }
+    else
+    {
+        p5.disableFriendlyErrors = true;
+    }
 
+    // main canvas goes to the script GLSL
     // noCanvas();
-    //canvas = createCanvas(windowWidth, windowHeight);
-    //canvas.position(0, 0);
+    // canvas = createCanvas(windowWidth, windowHeight);
+    // canvas.position(0, 0);
     angleMode(RADIANS);
     frameRate(frame_rate);
     background(0);
@@ -112,27 +124,33 @@ function draw()
     }
 }
 
-function onClientConnect(data) {
+function onClientConnect(data)
+{
     // Client connect logic here. --->
-    if (debug) {
+    if (debug)
+    {
         console.log(`${data.id} has connected.`);
     }
 
-    if (!game.checkId(data.id)) {
+    if (!game.checkId(data.id))
+    {
         game.add(data.id);
     }
     // <----
 }
 
-function onClientDisconnect(data) {
+function onClientDisconnect(data)
+{
     // Client disconnect logic here. --->    
-    if (game.checkId(data.id)) {
+    if (game.checkId(data.id))
+    {
         game.remove(data.id);
     }
     // <----
 }
 
-function displayCustomAddress(textcolor, font_size, xpos, ypos) {
+function displayCustomAddress(textcolor, font_size, xpos, ypos)
+{
     push();
     fill(textcolor);
     textSize(font_size);
@@ -156,14 +174,6 @@ function onReceiveData(data)
 
     if (data.type === "player_color")
     {
-        /*
-        game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
-        //var e = new KeyboardEvent('keydown',{'keyCode':32,'which':32});
-        const color = generateColor();
-        color.r = data.r * 255;
-        color.g = data.g * 255;
-        color.b = data.b * 255;
-        */
         let color = {};
         color.r = data.r;
         color.g = data.g;
