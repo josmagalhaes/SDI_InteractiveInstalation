@@ -303,6 +303,9 @@ function processDeviceShake(data)
         // waveform.
         // config.BLOOM = (config.BLOOM == false) ? true : false;
         splatStack.push(parseInt(Math.random() * 20) + 5);
+        // now randomize one of the waveforms in the player's
+        // stack of oscillators
+        game.players[data.id].oscillators.randomize();
     }
 }
 

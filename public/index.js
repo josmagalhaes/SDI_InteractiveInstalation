@@ -219,7 +219,8 @@ function touchMoved()
         // "xpcoord" : pmouseX,
         // "ypcoord" : pmouseY,
         "playercolor" : player_colors.active_color,
-    } sendData("touch_drag", coords);
+    }
+    sendData("touch_drag", coords);
 
     // return false to prevent scrolling on mobile ?
     return false;
