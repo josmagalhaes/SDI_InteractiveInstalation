@@ -201,7 +201,7 @@ function processMouseClick(data) {
         game.players[data.id].xcoord = data.xcoord;
         game.players[data.id].ycoord = data.ycoord;
 
-        const color = generateColor();
+        let color = {};
         color.r = data.playercolor[0];
         color.g = data.playercolor[1];
         color.b = data.playercolor[2];
@@ -209,31 +209,29 @@ function processMouseClick(data) {
         const y = data.ycoord;
         const dx = 1000 * (Math.random() - 0.5);
         const dy = 1000 * (Math.random() - 0.5);
-        console.log(color);
-        splat(x, y, dx, dy , color );
-
+        splat(x, y, dx, dy , color);
         
        const frequency = MathUtils.clamp(Math.round(
-                map(data.xcoord, 0, screen_width,
+                map(data.xcoord, 0, this.windowWidth,
                     game.players[data.id].frequency_range.min_frequency,
                     game.players[data.id].frequency_range.max_frequency)),
             absolute_min_frequency, absolute_max_frequency);
 
         const amplitude = MathUtils.clamp(
-            map(data.ycoord, 0, screen_height, 0.001, 1.0),
+            map(data.ycoord, 0, this.windowHeight, 0.001, 1.0),
             0.0, 1.0);
 
-        log(`processMouseClick: Frequency = ${frequency}, amplitude = ${amplitude}`);
+        if (debug)
+        {
+            log(`processMouseClick: Frequency = ${frequency}, amplitude = ${amplitude}`);
+        }
         game.updateSoundWaves(data.id, frequency, amplitude, "sine");
 
         //game.updateVisuals(data.id);
-        if (debug) {
+        if (debug)
+        {
             console.log(`${data.id} XY received: X = ${data.xcoord}, ${data.id} Y = ${data.ycoord}`);
         }
-
-
-           
-
     }
 }
 
