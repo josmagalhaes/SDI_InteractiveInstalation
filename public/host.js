@@ -146,18 +146,27 @@ function onReceiveData(data) {
             console.log(data);
         }
 
-        if (data.type === "player_color") {
+        if (data.type === "player_color")
+        {
+            /*
             game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
             //var e = new KeyboardEvent('keydown',{'keyCode':32,'which':32});
             const color = generateColor();
             color.r = data.r * 255;
             color.g = data.g * 255;
             color.b = data.b * 255;
+            */
+           game.setColor(
+               data.id,
+               data.playercolor[0],
+               data.playercolor[1],
+               data.playercolor[2]);
+                                
             const x = Math.random();
             const y = Math.random();
             const dx = 1000 * (Math.random() - 0.5);
             const dy = 1000 * (Math.random() - 0.5);
-            splat(x, y, dx, dy , color );
+            splat(x, y, dx, dy , game.players[data.id].color);
 
         } else if (data.type === "input_coords") {
             processMouseClick(data);
