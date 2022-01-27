@@ -98,7 +98,8 @@ class Oscillators
     // frequencies with mouse pressed
     randomize()
     {
-        const chosen = random(this.num_oscillators);
+        const chosen = Math.max(0, Math.floor(
+            Math.random() * this.num_oscillators));
         this.oscillators[chosen].freq(
             Math.round(random(this.min_frequency, this.max_frequency)));
         this.oscillators[chosen].amp(Math.random() / this.num_oscillators);
@@ -109,9 +110,11 @@ class Oscillators
         if (this.oscillators.length > 0 && this.playing)
         {
             const chosen =
-                Math.max(0, Math.floor(random(0, this.num_oscillators)));
+                Math.max(0, Math.floor((Math.random() * this.num_oscillators)));
+
             this.oscillators[chosen].freq(MathUtils.clamp(
                 frequency, this.min_frequency, this.max_frequency));
+                
             this.oscillators[chosen].amp(
                 MathUtils.clamp(amplitude, 0.0, 1.0) / this.num_oscillators);
             this.oscillators[chosen].setType(wavetype);
@@ -123,7 +126,7 @@ class Oscillators
         if (this.oscillators.length > 0 && this.playing)
         {
             const chosen =
-                Math.max(0, Math.floor(random(0, this.num_oscillators)));
+                Math.max(0, Math.floor((Math.random() * this.num_oscillators)));
             this.oscillators[chosen].setType(wavetype);
         }
     }
@@ -135,7 +138,8 @@ class Oscillators
             let wave_index =
                 (ndx != null || ndx === "undefined")
                     ? ndx
-                    : Math.max(0, Math.floor(random(this.num_oscillators)));
+                    : Math.max(0, Math.floor(Math.random() * this.num_oscillators));
+    
             const frequency = this.oscillators[wave_index].getFreq();
             this.oscillators[wave_index].freq(MathUtils.clamp(
                 scale * frequency, this.min_frequency, this.max_frequency));
