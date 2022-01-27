@@ -185,7 +185,7 @@ function onReceiveData(data) {
   }
   // Touch & drag, not yet active
   else if (data.type === "touch_drag") {
-    //processTouchDrag(data);
+    processTouchDrag(data);
   }
 }
 
@@ -212,7 +212,7 @@ function processMouseClick(data) {
   const dy = 1000 * (Math.random() - 0.5);
   splat(x, y, dx, dy, color);
 
-  const frequency = MathUtils.cla*mp(
+  const frequency = MathUtils.clamp(
       Math.round(map(data.xcoord, 0, this.windowWidth,
                      game.players[data.id].frequency_range.min_frequency,
                      game.players[data.id].frequency_range.max_frequency)),
@@ -234,7 +234,6 @@ function processMouseClick(data) {
   }
 }
 
-/*
 function processTouchDrag(data)
 {
   if (debug)
@@ -263,7 +262,6 @@ function processTouchDrag(data)
     // ${data.y_coord}, movedX = ${data.y_motion}`);
   }
 }
-*/
 
 //
 // Input processing
@@ -281,10 +279,7 @@ function processDeviceShake(data)
     // waveform.
     //config.BLOOM = (config.BLOOM == false) ? true : false;
     splatStack.push(parseInt(Math.random() * 20) + 5);
-
   }
-  //fill(255, 200, 0);
-  //text("process device shake");
 }
 
 function processDeviceSensors(data)

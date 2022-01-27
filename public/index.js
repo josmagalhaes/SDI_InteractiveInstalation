@@ -180,26 +180,23 @@ function onReceiveData(data) {
   }
 }
 
-// called every time the user touches screen or clicks
-
-/*
-function touchMoved() {
-  text("TOUCH MODED X = " + mouseX + ", CX = " + coordX);
-
+// called every time the user touches screen or clicks, essentially
+// touch & drag - this should be touch & dragging a splat
+function touchMoved()
+{
   if (debug) {
     console.log(`Touched at X = ${mouseX}, Y = ${mouseY}, cX = ${coordX}, cY = ${coordY}`);
   }
-  let coords = {
-    "xcoord" : mouseX,
-    "ycoord" : mouseY,
+  let coords =
+  {
+    "xcoord" :  mouseX / windowWidth,
+    "ycoord" : 1 - (mouseY / windowHeight),
     // mouse movement since last frame
     //"x_motion" : movedX,
     //"y_motion" : movedY,
     // previous coords
     // "xpcoord" : pmouseX,
     // "ypcoord" : pmouseY,
-    "coordx" : coordX,
-    "coordy" : coordY, 
     "playercolor" : player_colors.active_color,
   }
   sendData("touch_drag", coords);
@@ -207,20 +204,25 @@ function touchMoved() {
   // return false to prevent scrolling on mobile ?
   return false;
 }
-*/
 
+// Shaken... but not stirred... trigger multiple splats
 function deviceShaken()
 {
   // setShakeThreshold(30); // default, override in setup()
   sendData("shaken", {"shaken" : true});
 }
 
-/*
+// deviceMoved should define via threshold a state for resting or active/movement
+// position.
 // default threshold of 0.5 for device motion on X,Y,Z
+/*
 function deviceMoved() {
   device_motion_value = constrain(device_motion_value + 5, 0, 255);
 }
+*/
 
+// Touch end defines a start and end point, i.e, shutdown a screen
+/*
 function touchStarted(event)
 {
   if (debug) {
@@ -265,6 +267,7 @@ function deviceMoved(event)
   sendData("device_sensors", device_motion);
 }
 
+// Main mouse click or touchscreen click, triggers a splat
 function mouseClicked(event)
 {
   if (debug) {
