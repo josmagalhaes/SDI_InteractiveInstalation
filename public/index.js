@@ -81,7 +81,6 @@ function setup()
 
 function draw()
 {
-    console.log("BG = " + background_rgb);
     background(background_rgb);
 
     //if (isClientConnected(display = true))

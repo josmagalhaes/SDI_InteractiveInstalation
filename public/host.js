@@ -51,11 +51,13 @@ let qr_img;
 let tagDiv;
 
 
-function preload() {
+function preload()
+{
     setupHost();
 }
 
-function setup() {
+function setup()
+{
     if (debug) {
         setuplogger();
         console.log('Initializing...');
@@ -81,7 +83,8 @@ function setup() {
 
 }
 
-function draw() {
+function draw()
+{
     clear();
     fill(255, 127, 50);
     background(0);
@@ -99,9 +102,12 @@ function draw() {
 
     displayCustomAddress(color(255, 180), 12, 10, screen_height - 14);
 
-    if (debug) {
+    if (debug)
+    {
         document.getElementById("qrcode").innerHTML = qr_img;
-    } else {
+    }
+    else
+    {
         tagDiv.html(qr_img);
     }
 }
@@ -140,46 +146,48 @@ function displayCustomAddress(textcolor, font_size, xpos, ypos) {
 // so the game object must contain the game state, the cymatics
 //
 
-function onReceiveData(data) {
-    if (data != null) {
-        if (debug) {
-            console.log(data);
-        }
+function onReceiveData(data)
+{
+    if (data == null || data === "undefined") return;
 
-        if (data.type === "player_color")
-        {
-            /*
-            game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
-            //var e = new KeyboardEvent('keydown',{'keyCode':32,'which':32});
-            const color = generateColor();
-            color.r = data.r * 255;
-            color.g = data.g * 255;
-            color.b = data.b * 255;
-            */
-           game.setColor(
-               data.id,
-               data.playercolor[0],
-               data.playercolor[1],
-               data.playercolor[2]);
-                                
-            const x = Math.random();
-            const y = Math.random();
-            const dx = 1000 * (Math.random() - 0.5);
-            const dy = 1000 * (Math.random() - 0.5);
-            splat(x, y, dx, dy , game.players[data.id].color);
-
-        } else if (data.type === "input_coords") {
-            processMouseClick(data);
-            // game method to process input coords (sound effect)
-        }
-
-        /* Example:
-        if (data.type === 'myDataType') {
-            processMyData(data);
-        }
-        Use `data.type` to get the message type sent by client.
-        */
+    if (debug) {
+        console.log(`data keys = ${Object.keys(data)}`);
     }
+
+    if (data.type === "player_color")
+    {
+        /*
+        game.setColor(data.id, data.r * 255, data.g * 255, data.b * 255);
+        //var e = new KeyboardEvent('keydown',{'keyCode':32,'which':32});
+        const color = generateColor();
+        color.r = data.r * 255;
+        color.g = data.g * 255;
+        color.b = data.b * 255;
+        */
+        let color = {};
+        color.r = data.r;
+        color.g = data.g;
+        color.b = data.b;
+                            
+        const x = Math.random();
+        const y = Math.random();
+        const dx = 1000 * (Math.random() - 0.5);
+        const dy = 1000 * (Math.random() - 0.5);
+        splat(x, y, dx, dy , color);
+
+    } else if (data.type === "input_coords")
+    {
+        processMouseClick(data);
+        // game method to process input coords (sound effect)
+    }
+
+    /* Example:
+    if (data.type === 'myDataType') {
+        processMyData(data);
+    }
+    Use `data.type` to get the message type sent by client.
+    */
+
 }
 
 // This is included for testing purposes to demonstrate that
