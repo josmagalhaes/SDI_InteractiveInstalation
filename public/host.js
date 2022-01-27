@@ -50,7 +50,8 @@ let tagDiv;
 // font related
 let font;
 
-function preload() {
+function preload()
+{
   setupHost();
   // fonts must be loaded and set before drawing text
   // WebGL text()
@@ -177,14 +178,14 @@ function onReceiveData(data) {
   }
   // If device motion is above a shake threshold, trigger, so that we
   // have a binary state: resting | movement
-  else if (data.type === "device_moved") {
+  else if (data.type === "device_sensors") {
     // accelerationX|Y|Z, rotationX|Y|Z
     // inclination
-    //processDeviceSensors(data);
+    processDeviceSensors(data);
   }
   // Touch & drag, not yet active
   else if (data.type === "touch_drag") {
-    processTouchDrag(data);
+    //processTouchDrag(data);
   }
 }
 
@@ -233,17 +234,36 @@ function processMouseClick(data) {
   }
 }
 
-function processTouchDrag(data) {
-  if (debug) {
+/*
+function processTouchDrag(data)
+{
+  if (debug)
+  {
     fill(255, 200, 0);
     text("Process touch & drag:");
-    if (data != null) {
-      // text(`Process touch & drag: x coord = ${data.x_coord}, movedX =
-      // ${data.x_motion}`); text(`Process touch & drag: y coord =
-      // ${data.y_coord}, movedX = ${data.y_motion}`);
-    }
+  }
+
+  if (data != null)
+  {
+    game.players[data.id].xcoord = data.xcoord;
+    game.players[data.id].ycoord = data.ycoord;
+  
+    let color = {};
+    color.r = data.playercolor[0];
+    color.g = data.playercolor[1];
+    color.b = data.playercolor[2];
+    const x = data.xcoord;
+    const y = data.ycoord;
+    const dx = 1000 * (Math.random() - 0.5);
+    const dy = 1000 * (Math.random() - 0.5);
+    splat(x, y, dx, dy, color);
+
+    // text(`Process touch & drag: x coord = ${data.x_coord}, movedX =
+    // ${data.x_motion}`); text(`Process touch & drag: y coord =
+    // ${data.y_coord}, movedX = ${data.y_motion}`);
   }
 }
+*/
 
 //
 // Input processing
@@ -253,12 +273,25 @@ function processJoystick(data) {
   text("process joystick data", width / 2, height / 2);
 }
 
-function processDeviceShake(data) {
+function processDeviceShake(data)
+{
+  if (data != null && ("shaken" in data) && data.shaken == true)
+  {
+    ; // shift/randomize some sound effects, perhaps some visuals
+  }
   fill(255, 200, 0);
   text("process device shake");
 }
 
-function processDeviceSensors(data) {
+function processDeviceSensors(data)
+{
+  if (data == null || data === "undefined") return;
+
+  // increase the curl of the CFD
+  config.CURL = map(constrain(data.y_motion, 0.2, 0.8), 0.2, 0.8, 10, 100);
+  config.DENSITY_DISSIPATION = map(constrain(data.x_motion, 0.1, 0.9), 0.1, 0.9, 0.1, 2.0);
+  config.DENSITY_DISSIPATION = map(constrain(data.x_motion, 0.1, 0.9), 0.1, 0.9, 0.03, 0.3);
+
   fill(255, 200, 0);
   text("process device sensors");
 }

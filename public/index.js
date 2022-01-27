@@ -137,7 +137,7 @@ function draw() {
       "y_accel" : accelerationY,
       "z_accel" : accelerationZ,
     };
-    sendData("device_moved", device_motion);
+    //sendData("device_moved", device_motion);
     //
     // motion affected circle
     circle(device_motion.x_motion, device_motion.y_motion,
@@ -237,8 +237,7 @@ function touchStarted(event)
 }
 */
 
-/*
-function touchMoved(event)
+function deviceMoved(event)
 {
   // defined in the script coordX, coordY
   // https://forum.processing.org/two/discussion/12767/index.html#Comment_111133
@@ -246,15 +245,23 @@ function touchMoved(event)
     console.log(`sketch X = ${mouseX}, Y = ${mouseY}`);
   }
 
-  const input_coords = {
-    "xcoord" : coordX, // mouseX / windowWidth,
-    "ycoord" : coordY, // 1 - (mouseY / windowHeight),
+  let device_motion = {
+    "z_motion" : Math.round(windowWidth / 5 * Math.abs(radians(rotationZ) - PI)),
+    "y_motion" : Math.round(half_height + rotationX * 10) / windowHeight,
+    "x_motion" : Math.round(half_width + rotationY * 10) / windowWidth,
+    "x_rotation" : map(rotationX, -PI, PI, 0.0, windowWidth / 2),
+    "y_rotation" : map(rotationY, -PI, PI, 0.0, windowHeight / 2),
+    "z_rotation" : map(rotationZ, -PI, PI, 0.0, 1.0),
+    "x_accel" : accelerationX / windowWidth,
+    "y_accel" : accelerationY / windowWidth,
+    "z_accel" : accelerationZ,
     "playercolor" : player_colors.active_color,
   };
-  sendData("input_coords", input_coords);
-}
-*/
+  // This sends the mobile phone bubble level orientation as X,Y coords for the
+  // splatting - but it rapidly fills the screen.
 
+  sendData("device_sensors", device_motion);
+}
 
 function mouseClicked(event) {
   console.log("MOUSE CLICKED X = " + mouseX + ", CX = " + coordX);
@@ -268,7 +275,7 @@ function mouseClicked(event) {
     "ycoord" : 1 - (mouseY / windowHeight / 2),
     "playercolor" : player_colors.active_color,
   };
-  sendData("input_coords", input_coords);
+  //sendData("input_coords", input_coords);
 }
 
 /* full screening will change the size of the canvas */

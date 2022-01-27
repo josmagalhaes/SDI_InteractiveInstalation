@@ -26,7 +26,7 @@ let config =
       SPLAT_RADIUS : 0.25,
       SPLAT_FORCE : 6000,
       SHADING : true,
-      COLORFUL : true,
+      COLORFUL : false,
       COLOR_UPDATE_SPEED : 10,
       PAUSED : false,
       BACK_COLOR : {r : 0, g : 0, b : 0},
