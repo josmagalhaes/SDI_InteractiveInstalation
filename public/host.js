@@ -174,14 +174,14 @@ function onReceiveData(data) {
   }
   // If the device motion is above a shake threshold, trigger
   else if (data.type === "shaken") {
-    //processDeviceShake(data);
+    processDeviceShake(data);
   }
   // If device motion is above a shake threshold, trigger, so that we
   // have a binary state: resting | movement
   else if (data.type === "device_sensors") {
     // accelerationX|Y|Z, rotationX|Y|Z
     // inclination
-    processDeviceSensors(data);
+    //processDeviceSensors(data);
   }
   // Touch & drag, not yet active
   else if (data.type === "touch_drag") {
@@ -212,7 +212,7 @@ function processMouseClick(data) {
   const dy = 1000 * (Math.random() - 0.5);
   splat(x, y, dx, dy, color);
 
-  const frequency = MathUtils.clamp(
+  const frequency = MathUtils.cla*mp(
       Math.round(map(data.xcoord, 0, this.windowWidth,
                      game.players[data.id].frequency_range.min_frequency,
                      game.players[data.id].frequency_range.max_frequency)),
@@ -277,10 +277,12 @@ function processDeviceShake(data)
 {
   if (data != null && ("shaken" in data) && data.shaken == true)
   {
-    ; // shift/randomize some sound effects, perhaps some visuals
+    // toggle bloom on or off, but also try to shift some random
+    // waveform.
+    config.BLOOM = (config.BLOOM == false) ? true : false;
   }
-  fill(255, 200, 0);
-  text("process device shake");
+  //fill(255, 200, 0);
+  //text("process device shake");
 }
 
 function processDeviceSensors(data)

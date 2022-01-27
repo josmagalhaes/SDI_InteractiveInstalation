@@ -237,6 +237,8 @@ function touchStarted(event)
 }
 */
 
+// Map rotateY to curl, and rotateX to density and velocity attenuation
+//
 function deviceMoved(event)
 {
   // defined in the script coordX, coordY
@@ -263,9 +265,8 @@ function deviceMoved(event)
   sendData("device_sensors", device_motion);
 }
 
-function mouseClicked(event) {
-  console.log("MOUSE CLICKED X = " + mouseX + ", CX = " + coordX);
-
+function mouseClicked(event)
+{
   if (debug) {
     console.log(`sketch X = ${mouseX}, Y = ${mouseY}`);
   }
@@ -275,7 +276,7 @@ function mouseClicked(event) {
     "ycoord" : 1 - (mouseY / windowHeight / 2),
     "playercolor" : player_colors.active_color,
   };
-  //sendData("input_coords", input_coords);
+  sendData("input_coords", input_coords);
 }
 
 /* full screening will change the size of the canvas */
