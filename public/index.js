@@ -209,7 +209,7 @@ function touchMoved() {
 }
 */
 
-function deviceShake()
+function deviceShaken()
 {
   // setShakeThreshold(30); // default, override in setup()
   sendData("shaken", {"shaken" : true});

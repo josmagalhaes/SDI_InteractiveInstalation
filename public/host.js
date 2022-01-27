@@ -279,7 +279,9 @@ function processDeviceShake(data)
   {
     // toggle bloom on or off, but also try to shift some random
     // waveform.
-    config.BLOOM = (config.BLOOM == false) ? true : false;
+    //config.BLOOM = (config.BLOOM == false) ? true : false;
+    splatStack.push(parseInt(Math.random() * 20) + 5);
+
   }
   //fill(255, 200, 0);
   //text("process device shake");

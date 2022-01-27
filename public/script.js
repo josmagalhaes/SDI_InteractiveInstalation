@@ -35,7 +35,7 @@ let config =
       BLOOM : false,
       BLOOM_ITERATIONS : 8,
       BLOOM_RESOLUTION : 256,
-      BLOOM_INTENSITY : 1000.8,
+      BLOOM_INTENSITY : 0.8,
       BLOOM_THRESHOLD : 0.6,
       BLOOM_SOFT_KNEE : 0.7,
       SUNRAYS : true,
