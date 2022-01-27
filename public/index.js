@@ -13,7 +13,7 @@ const frame_rate    = 25;
 const debug = true;
 
 // network tests
-const serverIp   = "192.168.0.3";
+const serverIp   = "192.168.1.140";
 const serverPort  = "3000";
 const local = true;
 
@@ -81,7 +81,7 @@ function draw()
     //if (isClientConnected(display = true))
     if (isClientConnected())
     {
-        ;
+        
     }
     else
     {
@@ -114,10 +114,11 @@ function mouseClicked(event)
     {
         console.log(`sketch X = ${mouseX}, Y = ${mouseY}`);
     }
-
+    console.log(player_color);
     const input_coords = {
-        "xcoord" : mouseX,
-        "ycoord" : mouseY,
+        "xcoord" : mouseX/windowWidth,
+        "ycoord" : 1 - (mouseY/windowHeight),
+        "playercolor" : player_color["maxes"]["rgb"],
     };
     sendData("input_coords", input_coords);
 }
