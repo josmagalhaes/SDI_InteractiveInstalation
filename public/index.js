@@ -1,3 +1,4 @@
+
 "use strict";
 
 // TODO
@@ -81,13 +82,19 @@ function setup()
     if (debug)
     {
         setuplogger();
-        console.log('Initializing...');
+        console.log("Initializing...");
     }
 
     // noCanvas();
-    let canvas    = createCanvas(windowWidth, windowHeight);
-    screen_width  = windowWidth;
-    screen_height = windowHeight;
+    //let canvas    = createCanvas(windowWidth, windowHeight);
+	createMetaTag();
+	let canvas = createCanvas(window.innerWidth, window.innerHeight);
+
+    //screen_width  = windowWidth;
+    //screen_height = windowHeight;
+    screen_width = window.innerWidth;
+    screen_height = window.innerHeight;
+
     half_width    = screen_width / 2;
     half_height   = screen_height / 2;
 
@@ -209,6 +216,7 @@ function touchMoved()
         console.log(`Touched at X = ${mouseX}, Y = ${mouseY}, cX = ${
             coordX}, cY = ${coordY}`);
     }
+
     let coords = {
         "xcoord" : mouseX / windowWidth,
         "ycoord" : 1 - (mouseY / windowHeight),
@@ -219,7 +227,8 @@ function touchMoved()
         // "xpcoord" : pmouseX,
         // "ypcoord" : pmouseY,
         "playercolor" : player_colors.active_color,
-    }
+    };
+
     sendData("touch_drag", coords);
 
     // return false to prevent scrolling on mobile ?
@@ -302,6 +311,7 @@ function mouseClicked(event)
         "ycoord" : 1 - (mouseY / windowHeight / 2),
         "playercolor" : player_colors.active_color,
     };
+
     sendData("input_coords", input_coords);
 }
 
@@ -361,3 +371,12 @@ function mouseMoved(event)
 document.ontouchmove = function(event) {
     event.preventDefault();
 };
+
+function createMetaTag() {
+	let meta = createElement('meta');
+	meta.attribute('name', 'viewport');
+	meta.attribute('content', 'user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width,height=device-height');
+
+	let head = select('head');
+	meta.parent(head);
+}
