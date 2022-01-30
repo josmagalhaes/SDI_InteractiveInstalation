@@ -19,7 +19,7 @@ const frame_rate = 25;
 const debug = false;
 
 // network tests
-const serverIp   = "192.168.0.3";
+const serverIp   = "10.0.0.23";
 const serverPort = "3000";
 const local      = true;
 
@@ -307,8 +307,8 @@ function mouseClicked(event)
     }
 
     const input_coords = {
-        "xcoord" : mouseX / windowWidth / 2,
-        "ycoord" : 1 - (mouseY / windowHeight / 2),
+        "xcoord" : mouseX / windowWidth ,
+        "ycoord" : 1 - (mouseY / windowHeight ),
         "playercolor" : player_colors.active_color,
     };
 

@@ -1,25 +1,24 @@
-
-const serverIp   = "192.168.0.3";
+const serverIp = "10.0.0.23";
 const serverPort = "3000";
-const local      = true;
+const local = true;
 let game;
 
 // essential UI parameters
-const screen_width  = this.windowWidth;
+const screen_width = this.windowWidth;
 const screen_height = this.windowHeight;
 
-const frame_rate  = 25;
-const half_width  = screen_width / 2;
+const frame_rate = 25;
+const half_width = screen_width / 2;
 const half_height = screen_height / 2;
 
 // enable to debug
-const debug              = false;
+let debug = "false";
 p5.disableFriendlyErrors = true;
 
 // sound synthesis related
 const absolute_min_frequency = 20;
 const absolute_max_frequency = 20000; // for sound step
-const fft_samples            = 64;
+const fft_samples = 64;
 
 // We'll create an array of 10 oscillators then on a time basis change
 // the wave type, frequency, amplitude. Individually it will be
@@ -33,8 +32,7 @@ let tagDiv;
 // font related
 let font;
 
-function preload()
-{
+function preload() {
     setupHost();
     // fonts must be loaded and set before drawing text
     // WebGL text()
@@ -42,17 +40,21 @@ function preload()
     font = loadFont("assets/RobotoMono-Regular.ttf");
 }
 
-function setup()
-{
-    if (debug)
-    {
+function setup() {
+    if (localStorage.getItem("debug") === null) {
+        debug = false;
+        localStorage.setItem("debug", "false");
+    } else {
+        debug = localStorage.getItem("debug");
+    }
+
+    if (debug === "true") {
         p5.disableFriendlyErrors = false;
         setuplogger();
         console.log("Initializing...");
-    }
-    else
-    {
+    } else {
         p5.disableFriendlyErrors = true;
+        document.getElementById("loggerbottombar").style.display = "none";
     }
 
     // main canvas goes to the script GLSL
@@ -76,10 +78,8 @@ function setup()
     // <----
 }
 
-function draw()
-{
-    if (isHostConnected(display = true))
-    {
+function draw() {
+    if (isHostConnected(display = true)) {
         // Host/Game draw here. --->
         // Display player IDs in top left corner
         game.printPlayerIds(5, 20);
@@ -95,58 +95,53 @@ function draw()
     normalize_all_waves();
 
     displayCustomAddress(color(255, 180), 12, 10, screen_height - 14)
-    document.getElementById("qrcode").innerHTML = qr_img;
-}
-
-function randomize_wave()
-{
-    if (frameCount % (2 * frame_rate) == 0)
-    {
-        Object.entries(game.players).forEach(([key, value]) => {
-                if (Math.random() < 0.333) {
-                    value.oscillators.randomize();
-                }
-            });
+    if (debug === "true") {
+        document.getElementById("qrcode").innerHTML = qr_img;
+    } else {
+        document.getElementById("qrcode_nodebug").innerHTML = qr_img;
     }
 }
 
-function normalize_all_waves()
-{
-    Object.entries(game.players).forEach(([key, value]) => {
-            const denom = game.numPlayers * value.oscillators.oscillators.length;
-            value.oscillators.normalization = 1.0 / denom;
-            value.oscillators.update_all_amplitudes(
-                value.oscillators.normalization);
+function randomize_wave() {
+    if (frameCount % (2 * frame_rate) == 0) {
+        Object.entries(game.players).forEach(([key, value]) => {
+            if (Math.random() < 0.333) {
+                value.oscillators.randomize();
+            }
         });
+    }
 }
 
-function onClientConnect(data)
-{
+function normalize_all_waves() {
+    Object.entries(game.players).forEach(([key, value]) => {
+        const denom = game.numPlayers * value.oscillators.oscillators.length;
+        value.oscillators.normalization = 1.0 / denom;
+        value.oscillators.update_all_amplitudes(
+            value.oscillators.normalization);
+    });
+}
+
+function onClientConnect(data) {
     // Client connect logic here. --->
-    if (debug)
-    {
+    if (debug) {
         console.log(`${data.id} has connected.`);
     }
 
-    if (!game.checkId(data.id))
-    {
+    if (!game.checkId(data.id)) {
         game.add(data.id);
     }
     // <----
 }
 
-function onClientDisconnect(data)
-{
+function onClientDisconnect(data) {
     // Client disconnect logic here. --->
-    if (game.checkId(data.id))
-    {
+    if (game.checkId(data.id)) {
         game.remove(data.id);
     }
     // <----
 }
 
-function displayCustomAddress(textcolor, font_size, xpos, ypos)
-{
+function displayCustomAddress(textcolor, font_size, xpos, ypos) {
     push();
     fill(textcolor);
     textSize(font_size);
@@ -163,50 +158,42 @@ function displayCustomAddress(textcolor, font_size, xpos, ypos)
 // so the game object must contain the game state, the cymatics
 //
 
-function onReceiveData(data)
-{
+function onReceiveData(data) {
     if (data == null || data === "undefined")
         return;
 
-    if (debug)
-    {
+    if (debug) {
         console.log(`data keys = ${Object.keys(data)}`);
     }
 
-    if (data.type === "player_color")
-    {
+    if (data.type === "player_color") {
         let color = {};
-        color.r   = data.r;
-        color.g   = data.g;
-        color.b   = data.b;
+        color.r = data.r;
+        color.g = data.g;
+        color.b = data.b;
 
-        const x  = Math.random();
-        const y  = Math.random();
+        const x = Math.random();
+        const y = Math.random();
         const dx = 1000 * (Math.random() - 0.5);
         const dy = 1000 * (Math.random() - 0.5);
         splat(x, y, dx, dy, color);
-    }
-    else if (data.type === "input_coords")
-    {
+    } else if (data.type === "input_coords") {
         processMouseClick(data);
         // game method to process input coords (sound effect)
     }
     // If the device motion is above a shake threshold, trigger
-    else if (data.type === "shaken")
-    {
+    else if (data.type === "shaken") {
         processDeviceShake(data);
     }
     // If device motion is above a shake threshold, trigger, so that we
     // have a binary state: resting | movement
-    else if (data.type === "device_sensors")
-    {
+    else if (data.type === "device_sensors") {
         // accelerationX|Y|Z, rotationX|Y|Z
         // inclination
         // processDeviceSensors(data);
     }
     // Touch & drag, not yet active
-    else if (data.type === "touch_drag")
-    {
+    else if (data.type === "touch_drag") {
         processTouchDrag(data);
     }
 }
@@ -217,8 +204,7 @@ function onReceiveData(data)
 // was declared outside any method, globally, but instantiated within setup()
 //
 
-function processMouseClick(data)
-{
+function processMouseClick(data) {
     if (data == null || data === "undefined")
         return;
 
@@ -226,13 +212,13 @@ function processMouseClick(data)
     game.players[data.id].ycoord = data.ycoord;
 
     let color = {};
-    color.r   = data.playercolor[0];
-    color.g   = data.playercolor[1];
-    color.b   = data.playercolor[2];
-    const x   = data.xcoord;
-    const y   = data.ycoord;
-    const dx  = 1000 * (Math.random() - 0.5);
-    const dy  = 1000 * (Math.random() - 0.5);
+    color.r = data.playercolor[0];
+    color.g = data.playercolor[1];
+    color.b = data.playercolor[2];
+    const x = data.xcoord;
+    const y = data.ycoord;
+    const dx = 1000 * (Math.random() - 0.5);
+    const dy = 1000 * (Math.random() - 0.5);
     splat(x, y, dx, dy, color);
 
     const frequency = MathUtils.clamp(
@@ -248,42 +234,37 @@ function processMouseClick(data)
     const amplitude = MathUtils.clamp(
         map(data.ycoord, 0, this.windowHeight, 0.001, 1.0), 0.0, 1.0);
 
-    if (debug)
-    {
+    if (debug) {
         log(`processMouseClick: Frequency = ${frequency}, amplitude = ${
             amplitude}`);
     }
     game.updateSoundWaves(data.id, frequency, amplitude, "sine");
 
     // game.updateVisuals(data.id);
-    if (debug)
-    {
+    if (debug) {
         console.log(`${data.id} XY received: X = ${data.xcoord}, ${
             data.id} Y = ${data.ycoord}`);
     }
 }
 
-function processTouchDrag(data)
-{
-    if (debug)
-    {
+function processTouchDrag(data) {
+    if (debug) {
         fill(255, 200, 0);
         text("Process touch & drag:");
     }
 
-    if (data != null)
-    {
+    if (data != null) {
         game.players[data.id].xcoord = data.xcoord;
         game.players[data.id].ycoord = data.ycoord;
 
         let color = {};
-        color.r   = data.playercolor[0];
-        color.g   = data.playercolor[1];
-        color.b   = data.playercolor[2];
-        const x   = data.xcoord;
-        const y   = data.ycoord;
-        const dx  = 1000 * (Math.random() - 0.5);
-        const dy  = 1000 * (Math.random() - 0.5);
+        color.r = data.playercolor[0];
+        color.g = data.playercolor[1];
+        color.b = data.playercolor[2];
+        const x = data.xcoord;
+        const y = data.ycoord;
+        const dx = 1000 * (Math.random() - 0.5);
+        const dy = 1000 * (Math.random() - 0.5);
         splat(x, y, dx, dy, color);
 
         // text(`Process touch & drag: x coord = ${data.x_coord}, movedX =
@@ -295,16 +276,13 @@ function processTouchDrag(data)
 //
 // Input processing
 // TODO: move to own separate class, this is annoying
-function processJoystick(data)
-{
+function processJoystick(data) {
     fill(0, 255, 0);
     text("process joystick data", width / 2, height / 2);
 }
 
-function processDeviceShake(data)
-{
-    if (data != null && ("shaken" in data) && data.shaken == true)
-    {
+function processDeviceShake(data) {
+    if (data != null && ("shaken" in data) && data.shaken == true) {
         // toggle bloom on or off, but also try to shift some random
         // waveform.
         // config.BLOOM = (config.BLOOM == false) ? true : false;
@@ -315,8 +293,7 @@ function processDeviceShake(data)
     }
 }
 
-function processDeviceSensors(data)
-{
+function processDeviceSensors(data) {
     if (data == null || data === "undefined")
         return;
 
@@ -357,16 +334,14 @@ screen - let's move if (coordX < window.innerWidth) { setTimeout(() => { move();
 */
 
 // Displays server address in lower left of screen
-function room_url(roomid = null)
-{
+function room_url(roomid = null) {
     if (roomid != null)
         return `${serverIp}:${serverPort}/?="${roomId}"`;
 
     return `${serverIp}:${serverPort}/?=sdi4`;
 }
 
-function generate_qrcode(qr_input_string, margin, size)
-{
+function generate_qrcode(qr_input_string, margin, size) {
     // qrcode for server, room
     // const qr_input_string = room_url();
     let qr = qrcode(0, "L");
@@ -378,13 +353,13 @@ function generate_qrcode(qr_input_string, margin, size)
 
 // This is included for testing purposes to demonstrate that
 // messages can be sent from a host back to all connected clients
-function mousePressed()
-{
-    sendData("timestamp", {timestamp : millis()});
+function mousePressed() {
+    sendData("timestamp", {
+        timestamp: millis()
+    });
     userStartAudio();
 }
 
-function windowResized()
-{
+function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
 }

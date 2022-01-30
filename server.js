@@ -9,7 +9,7 @@ let rooms   = {};
 let express = require('express');
 let app = express();
 let port=Number(process.env.PORT || 3000);
-let server = app.listen(port,"192.168.0.3");
+let server = app.listen(port,"10.0.0.23");
 
 app.use(express.static('public'));
 console.log("My socket server is running on port " + port);
